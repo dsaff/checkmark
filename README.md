@@ -4,6 +4,7 @@ The primary purpose of this repository is to demonstrate a
 "Minimum Viable Assertion API", focused on the single method `check()`.
 
 `check` does the two main things that one wants when making a test assertion:
+
 1. Causes the test to fail if a property is not true.
 1. Reports data _that is not obvious from reading the test code_ to help
    determine why the property is false.
