@@ -16,64 +16,110 @@ limitations under the License.
 package net.saff.checkmark
 
 class Checkmark {
-    class Failure(s: String, e: Throwable? = null) : java.lang.RuntimeException(s, e)
+  class Failure(s: String, e: Throwable? = null) : java.lang.RuntimeException(s, e)
 
-    private val marks = mutableListOf<() -> String>()
+  private val marks = mutableListOf<() -> String>()
 
-    fun mark(note: String): String {
-        marks.add { note }
-        return note
+  fun <T> mark(note: T): T {
+    marks.add { note.toString() }
+    return note
+  }
+
+  fun mark(fn: () -> String) {
+    marks.add(fn)
+  }
+
+  private fun marks() = marks.joinToString { "\n  mark: ${it()}" }
+
+  companion object {
+    fun fail(s: String, e: Throwable? = null): Nothing = throw Failure(s, e)
+
+    fun <T> T.check(eval: Checkmark.(T) -> Boolean): T {
+      val cm = Checkmark()
+      val result = try {
+        cm.eval(this)
+      } catch (t: Throwable) {
+        fail("ERROR: ${allDebugOutput(this, cm, eval)}", t)
+      }
+      if (!result) {
+        fail("Failed assertion: ${allDebugOutput(this, cm, eval)}")
+      }
+      return this
     }
 
-    fun mark(fn: () -> String) {
-        marks.add(fn)
+    fun checks(fn: () -> Unit) {
+      try {
+        fn()
+      } catch (e: Throwable) {
+        val data =
+          extractClosureFields(fn).joinToString("") { it.run { "\n$first: [[$second]]" } }
+        fail(data, e)
+      }
     }
 
-    private fun marks() = marks.joinToString { "\n  mark: ${it()}" }
-
-    companion object {
-        fun fail(s: String, e: Throwable? = null): Nothing = throw Failure(s, e)
-
-        fun <T> T.check(eval: Checkmark.(T) -> Boolean): T {
-            val cm = Checkmark()
-            val result = try {
-                cm.eval(this)
-            } catch (t: Throwable) {
-                fail("ERROR: ${allDebugOutput(cm)}", t)
-            }
-            if (!result) {
-                fail("Failed assertion: ${allDebugOutput(cm)}")
-            }
-            return this
+    private fun extractClosureFields(closure: Any) = buildList {
+      closure::class.java.declaredFields.forEach { field ->
+        // SAFF: do we understand why this is needed?
+        if (field.name != "INSTANCE") {
+          field.isAccessible = true
+          add(field.name.removePrefix("\$") to field.get(closure))
         }
-
-        fun checks(fn: () -> Unit) {
-            try {
-                fn()
-            } catch (e: Throwable) {
-                val data =
-                    extractClosureFields(fn).joinToString("") { it.run { "\n$first: [[$second]]" } }
-                fail(data, e)
-            }
-        }
-
-        private fun extractClosureFields(closure: Any) = buildList {
-            closure::class.java.declaredFields.forEach { field ->
-                field.isAccessible = true
-                add(field.name to field.get(closure))
-            }
-        }
-
-        private fun <T> T.allDebugOutput(cm: Checkmark) = "<<$this>>${cm.marks()}"
-
-        fun <T> T.checkCompletes(eval: Checkmark.(T) -> Unit): T {
-            val cm = Checkmark()
-            try {
-                cm.eval(this)
-            } catch (e: Throwable) {
-                throw Exception("Failed: <<$this>>${cm.marks()}", e)
-            }
-            return this
-        }
+      }
     }
+
+    private fun <T> allDebugOutput(
+      receiver: T,
+      cm: Checkmark,
+      eval: Checkmark.(T) -> Boolean
+    ): String {
+      val reports = buildList {
+        // SAFF: maybe allDebugOutput shouldn't have a receiver?
+        add("actual" to receiver)
+        addAll(extractClosureFields(eval))
+        addAll(cm.marks.map { "marked" to it() })
+      }
+      return if (reports.size == 1) {
+        reports[0].second.toString().forCleanDisplay()
+      } else {
+        // SAFF: DUP above
+        reports.joinToString("") { "\n${it.makeDebugLine()}" }
+      }
+    }
+
+    // SAFF: inline?
+    private fun Pair<String, Any?>.makeDebugLine(): String {
+      // SAFF: DUP above?
+      return "- $first: ${second.toString().forCleanDisplay()}"
+    }
+
+    private fun String.forCleanDisplay(): String {
+      return if (!contains("\n")) {
+        this
+      } else {
+        // SAFF: DUP on "  |"?
+        "\n  |${replace("\n", "\n  |")}"
+      }
+    }
+
+    fun <T> T.checkCompletes(eval: Checkmark.(T) -> Unit): T {
+      val cm = Checkmark()
+      try {
+        cm.eval(this)
+      } catch (e: Throwable) {
+        throw Exception("Failed: <<$this>>${cm.marks()}", e)
+      }
+      return this
+    }
+  }
 }
+
+fun thrown(fn: () -> Any?): Throwable? {
+  try {
+    fn()
+  } catch (t: Throwable) {
+    return t
+  }
+  return null
+}
+
+fun String.showWhitespace() = replace(" ", "_").replace("\n", "\\\n")
