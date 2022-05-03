@@ -51,8 +51,7 @@ class Checkmark {
       try {
         fn()
       } catch (e: Throwable) {
-        val data =
-          extractClosureFields(fn).joinToString("") { it.run { "\n$first: [[$second]]" } }
+        val data = extractClosureFields(fn).joinToString("") { it.run { "\n$first: [[$second]]" } }
         fail(data, e)
       }
     }
@@ -69,12 +68,9 @@ class Checkmark {
     }
 
     private fun <T> allDebugOutput(
-      receiver: T,
-      cm: Checkmark,
-      eval: Checkmark.(T) -> Boolean
+      receiver: T, cm: Checkmark, eval: Checkmark.(T) -> Boolean
     ): String {
       val reports = buildList {
-        // SAFF: maybe allDebugOutput shouldn't have a receiver?
         add("actual" to receiver)
         addAll(extractClosureFields(eval))
         addAll(cm.marks.map { "marked" to it() })
@@ -82,23 +78,16 @@ class Checkmark {
       return if (reports.size == 1) {
         reports[0].second.toString().forCleanDisplay()
       } else {
-        // SAFF: DUP above
-        reports.joinToString("") { "\n${it.makeDebugLine()}" }
+        reports.joinToString("") { "\n- ${it.first}: ${it.second.toString().forCleanDisplay()}" }
       }
-    }
-
-    // SAFF: inline?
-    private fun Pair<String, Any?>.makeDebugLine(): String {
-      // SAFF: DUP above?
-      return "- $first: ${second.toString().forCleanDisplay()}"
     }
 
     private fun String.forCleanDisplay(): String {
       return if (!contains("\n")) {
         this
       } else {
-        // SAFF: DUP on "  |"?
-        "\n  |${replace("\n", "\n  |")}"
+        val margin = "  |"
+        "\n$margin${replace("\n", "\n$margin")}"
       }
     }
 

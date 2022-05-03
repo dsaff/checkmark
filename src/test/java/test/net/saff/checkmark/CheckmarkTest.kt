@@ -12,10 +12,8 @@ class CheckmarkTest {
     thrown { "Pear soup".check { it == n } }!!.message.check { it!!.contains("Apple") }
   }
 
-  // SAFF: are failures printed twice on purpose?
   @Test
   fun outputWithMark() {
-    // SAFF: no "this" if there's only this
     val expect = """
         |Failed assertion: 
         |- actual: A
