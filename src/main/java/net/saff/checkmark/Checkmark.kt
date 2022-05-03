@@ -59,7 +59,8 @@ class Checkmark {
 
     private fun extractClosureFields(closure: Any) = buildList {
       closure::class.java.declaredFields.forEach { field ->
-        // SAFF: do we understand why this is needed?
+        // Not sure why this is needed.
+        // https://github.com/dsaff/checkmark/issues/1
         if (field.name != "INSTANCE") {
           field.isAccessible = true
           add(field.name.removePrefix("\$") to field.get(closure))
