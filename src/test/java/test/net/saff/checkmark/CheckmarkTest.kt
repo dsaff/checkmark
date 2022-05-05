@@ -1,6 +1,7 @@
 package test.net.saff.checkmark
 
 import net.saff.checkmark.Checkmark.Companion.check
+import net.saff.checkmark.Checkmark.Companion.checks
 import net.saff.checkmark.showWhitespace
 import net.saff.checkmark.thrown
 import org.junit.Test
@@ -22,5 +23,17 @@ class CheckmarkTest {
     thrown { "A".check { it == mark("B") } }!!.message!!.showWhitespace().check {
       it == expect
     }
+  }
+
+  @Test
+  fun meldStackTrace() {
+    var rootStackTrace: List<StackTraceElement>? = null
+    thrown {
+      checks {
+        val re = RuntimeException("flubber")
+        rootStackTrace = re.stackTrace.toList()
+        throw re
+      }
+    }!!.stackTrace.toList().check { trace -> trace[0] == rootStackTrace!![0] }
   }
 }

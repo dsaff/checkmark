@@ -16,7 +16,17 @@ limitations under the License.
 package net.saff.checkmark
 
 class Checkmark {
-  class Failure(s: String, e: Throwable? = null) : java.lang.RuntimeException(s, e)
+  class Failure(s: String, e: Throwable? = null) :
+    java.lang.RuntimeException(e?.message?.let { m -> m + "\n" + s } ?: s, e) {
+    override fun getStackTrace(): Array<StackTraceElement> {
+      val causeHere = cause
+      return if (causeHere != null) {
+        causeHere.stackTrace
+      } else {
+        super.getStackTrace()
+      }
+    }
+  }
 
   private val marks = mutableListOf<() -> String>()
 
