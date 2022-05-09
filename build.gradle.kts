@@ -25,7 +25,7 @@ buildscript {
 plugins {
   id("java")
   id("java-library")
-  id("org.jetbrains.kotlin.jvm") version "1.6.20"
+  id("org.jetbrains.kotlin.jvm")
   id("signing")
   id("maven-publish")
 }
@@ -40,10 +40,7 @@ kotlin {}
 dependencies {
   implementation(kotlin("stdlib-jdk8"))
   testImplementation("junit:junit:4.13.1")
-}
-
-repositories {
-  mavenCentral()
+  implementation(kotlin("reflect"))
 }
 
 val sourcesJar by tasks.creating(Jar::class) {
@@ -71,10 +68,9 @@ publishing {
     create<MavenPublication>("maven") {
       groupId = "net.saff.checkmark"
       artifactId = "checkmark"
-      version = "0.1.3"
+      version = "0.1.4"
 
       from(components["java"])
-
 
       artifact(sourcesJar)
       artifact(javadocJar)

@@ -61,8 +61,7 @@ class Checkmark {
       try {
         fn()
       } catch (e: Throwable) {
-        val data = extractClosureFields(fn).joinToString("") { it.run { "\n$first: [[$second]]" } }
-        fail(data, e)
+        fail(extractClosureFields(fn).cleanPairsForDisplay(), e)
       }
     }
 
@@ -70,6 +69,7 @@ class Checkmark {
       closure::class.java.declaredFields.forEach { field ->
         // Not sure why this is needed.
         // https://github.com/dsaff/checkmark/issues/1
+        // SAFF: don't print functions?
         if (field.name != "INSTANCE") {
           field.isAccessible = true
           add(field.name.removePrefix("\$") to field.get(closure))
@@ -88,9 +88,12 @@ class Checkmark {
       return if (reports.size == 1) {
         reports[0].second.toString().forCleanDisplay()
       } else {
-        reports.joinToString("") { "\n- ${it.first}: ${it.second.toString().forCleanDisplay()}" }
+        cleanPairsForDisplay(reports)
       }
     }
+
+    private fun cleanPairsForDisplay(reports: List<Pair<String, Any?>>) =
+      reports.joinToString("") { "\n- ${it.first}: ${it.second.toString().forCleanDisplay()}" }
 
     private fun String.forCleanDisplay(): String {
       return if (!contains("\n")) {
@@ -123,3 +126,30 @@ fun thrown(fn: () -> Any?): Throwable? {
 }
 
 fun String.showWhitespace() = replace(" ", "_").replace("\n", "\\\n")
+
+// SAFF: use in more checkmark places, and remove DUP
+private fun List<Pair<String, Any?>>.cleanPairsForDisplay() =
+  joinToString("\n") { "- ${it.first}: ${it.second.toString().forCleanDisplay(false)}" }
+
+private fun String.forCleanDisplay(realString: Boolean = true): String {
+  return if (!contains("\n")) {
+    this
+  } else {
+    val margin = if (realString) { "  |" } else { "  " }
+    "\n$margin${replace("\n", "\n$margin")}"
+  }
+}
+
+fun Any?.prettyPrint(): String {
+  when (this) {
+    is Map<*, *> -> {
+      return entries.map { it.key.toString() to it.value.prettyPrint() }.cleanPairsForDisplay()
+    }
+    is Collection<*> -> {
+      return mapIndexed { i, value -> i.toString() to value.prettyPrint() }.cleanPairsForDisplay()
+    }
+    else -> {
+      return toString()
+    }
+  }
+}
