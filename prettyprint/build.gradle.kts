@@ -25,7 +25,7 @@ buildscript {
 plugins {
   id("java")
   id("java-library")
-  id("org.jetbrains.kotlin.jvm")
+  id("org.jetbrains.kotlin.jvm").version("1.6.21")
   id("signing")
   id("maven-publish")
 }
@@ -67,7 +67,7 @@ publishing {
   publications {
     create<MavenPublication>("maven") {
       groupId = "net.saff.checkmark"
-      artifactId = "checkmark"
+      artifactId = "prettyprint"
       version = "0.1.4"
 
       from(components["java"])
@@ -77,7 +77,7 @@ publishing {
 
       pom {
         name.set("checkmark")
-        description.set("Minimum viable kotlin assertion framework")
+        description.set("Pretty-printing for debuggin and assertions")
         url.set("https://github.com/dsaff/checkmark")
 
         licenses {

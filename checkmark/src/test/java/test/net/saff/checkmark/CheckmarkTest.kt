@@ -2,8 +2,8 @@ package test.net.saff.checkmark
 
 import net.saff.checkmark.Checkmark.Companion.check
 import net.saff.checkmark.Checkmark.Companion.checks
-import net.saff.checkmark.showWhitespace
 import net.saff.checkmark.thrown
+import net.saff.prettyprint.showWhitespace
 import org.junit.Test
 
 class CheckmarkTest {

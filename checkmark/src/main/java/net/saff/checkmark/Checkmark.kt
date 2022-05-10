@@ -15,6 +15,8 @@ limitations under the License.
  */
 package net.saff.checkmark
 
+import net.saff.prettyprint.cleanPairsForDisplay
+
 class Checkmark {
   class Failure(s: String, e: Throwable? = null) :
     java.lang.RuntimeException(e?.message?.let { m -> m + "\n" + s } ?: s, e) {
@@ -69,6 +71,7 @@ class Checkmark {
       closure::class.java.declaredFields.forEach { field ->
         // Not sure why this is needed.
         // https://github.com/dsaff/checkmark/issues/1
+        // SAFF: separate out prettyPrint
         // SAFF: don't print functions?
         if (field.name != "INSTANCE") {
           field.isAccessible = true
@@ -104,6 +107,7 @@ class Checkmark {
       }
     }
 
+    // SAFF: remove for checks?
     fun <T> T.checkCompletes(eval: Checkmark.(T) -> Unit): T {
       val cm = Checkmark()
       try {
@@ -123,33 +127,4 @@ fun thrown(fn: () -> Any?): Throwable? {
     return t
   }
   return null
-}
-
-fun String.showWhitespace() = replace(" ", "_").replace("\n", "\\\n")
-
-// SAFF: use in more checkmark places, and remove DUP
-private fun List<Pair<String, Any?>>.cleanPairsForDisplay() =
-  joinToString("\n") { "- ${it.first}: ${it.second.toString().forCleanDisplay(false)}" }
-
-private fun String.forCleanDisplay(realString: Boolean = true): String {
-  return if (!contains("\n")) {
-    this
-  } else {
-    val margin = if (realString) { "  |" } else { "  " }
-    "\n$margin${replace("\n", "\n$margin")}"
-  }
-}
-
-fun Any?.prettyPrint(): String {
-  when (this) {
-    is Map<*, *> -> {
-      return entries.map { it.key.toString() to it.value.prettyPrint() }.cleanPairsForDisplay()
-    }
-    is Collection<*> -> {
-      return mapIndexed { i, value -> i.toString() to value.prettyPrint() }.cleanPairsForDisplay()
-    }
-    else -> {
-      return toString()
-    }
-  }
 }
