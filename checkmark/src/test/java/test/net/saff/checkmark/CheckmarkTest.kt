@@ -8,6 +8,12 @@ import org.junit.Test
 
 class CheckmarkTest {
   @Test
+  fun dontPrintFunctions() {
+    val fn = { "abc" }
+    thrown { checks { "def".check { it == fn() } } }!!.message!!.check { !it.contains("->") }
+  }
+
+  @Test
   fun checkIncludesCaptures() {
     val n = "Apple sauce"
     thrown { "Pear soup".check { it == n } }!!.message.check { it!!.contains("Apple") }

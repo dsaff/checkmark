@@ -71,11 +71,12 @@ class Checkmark {
       closure::class.java.declaredFields.forEach { field ->
         // Not sure why this is needed.
         // https://github.com/dsaff/checkmark/issues/1
-        // SAFF: separate out prettyPrint
-        // SAFF: don't print functions?
         if (field.name != "INSTANCE") {
           field.isAccessible = true
-          add(field.name.removePrefix("\$") to field.get(closure))
+          val gotten = field.get(closure)
+          if (!(gotten is Function<*>)) {
+            add(field.name.removePrefix("\$") to gotten)
+          }
         }
       }
     }
