@@ -1,6 +1,7 @@
 package test.net.saff.checkmark
 
 import net.saff.checkmark.Checkmark.Companion.check
+import net.saff.checkmark.Checkmark.Companion.checkCompletes
 import net.saff.checkmark.Checkmark.Companion.checks
 import net.saff.checkmark.thrown
 import net.saff.prettyprint.showWhitespace
@@ -41,5 +42,15 @@ class CheckmarkTest {
         throw re
       }
     }!!.stackTrace.toList().check { trace -> trace[0] == rootStackTrace!![0] }
+  }
+
+  @Test
+  fun checkCompletesWorks() {
+    thrown {
+      checkCompletes {
+        mark("abc")
+        throw RuntimeException("foo")
+      }
+    }!!.message!!.check { it.contains("abc") }
   }
 }

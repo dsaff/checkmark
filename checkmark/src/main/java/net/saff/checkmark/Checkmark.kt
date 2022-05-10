@@ -108,7 +108,6 @@ class Checkmark {
       }
     }
 
-    // SAFF: remove for checks?
     fun <T> T.checkCompletes(eval: Checkmark.(T) -> Unit): T {
       val cm = Checkmark()
       try {
