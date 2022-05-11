@@ -69,7 +69,7 @@ publishing {
     create<MavenPublication>("maven") {
       groupId = "net.saff.checkmark"
       artifactId = "checkmark"
-      version = "0.1.4"
+      version = "0.1.5"
 
       from(components["java"])
 
