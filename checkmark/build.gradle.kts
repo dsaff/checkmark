@@ -25,7 +25,7 @@ buildscript {
 plugins {
   id("java")
   id("java-library")
-  id("org.jetbrains.kotlin.jvm").version("1.6.21")
+  id("org.jetbrains.kotlin.jvm")
   id("signing")
   id("maven-publish")
 }
@@ -38,7 +38,7 @@ java {
 kotlin {}
 
 dependencies {
-  implementation(project(":prettyprint"))
+  implementation(project(":checkmark:prettyprint"))
   implementation(kotlin("stdlib-jdk8"))
   testImplementation("junit:junit:4.13.1")
   implementation(kotlin("reflect"))
