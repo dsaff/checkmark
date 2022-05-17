@@ -38,7 +38,7 @@ java {
 kotlin {}
 
 dependencies {
-  implementation(project(":checkmark:prettyprint"))
+  implementation(project(":prettyprint"))
   implementation(kotlin("stdlib-jdk8"))
   testImplementation("junit:junit:4.13.1")
   implementation(kotlin("reflect"))
