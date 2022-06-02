@@ -40,7 +40,7 @@ kotlin {}
 dependencies {
   implementation(project(":prettyprint"))
   implementation(kotlin("stdlib-jdk8"))
-  testImplementation("junit:junit:4.13.1")
+  testImplementation("junit:junit:4.13.2")
   implementation(kotlin("reflect"))
 }
 
@@ -113,8 +113,9 @@ publishing {
       // For snapshots, url = uri("https://s01.oss.sonatype.org/content/repositories/snapshots")
       url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2")
       credentials {
-        username = nexusUsername
-        password = nexusPassword
+        // SAFF: re-enable?
+//        username = nexusUsername
+//        password = nexusPassword
       }
     }
   }
