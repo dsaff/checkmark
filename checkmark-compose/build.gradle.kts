@@ -26,10 +26,11 @@ buildscript {
 }
 
 plugins {
-    id("com.android.library") version "7.4.0-alpha08"
+    id("com.android.library") version "7.0.4"
     id("org.jetbrains.kotlin.android")
 }
 
+// SAFF: work through build-time warnings
 // SIGNAL: warnings
 android {
     compileSdk = 32
