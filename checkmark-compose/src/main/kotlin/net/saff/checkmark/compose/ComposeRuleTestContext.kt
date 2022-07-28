@@ -1,14 +1,16 @@
+package net.saff.checkmark.compose
+
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.printToLog
 import net.saff.checkmark.Checkmark
+import net.saff.junit.extract
 import net.saff.junit.wrap
 import org.robolectric.shadows.ShadowLog
 import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 
-// SAFF: DUP with Dominalone
 data class ComposeRuleTestContext(val cr: ComposeContentTestRule) {
   val log = mutableListOf<String>()
 
@@ -16,7 +18,7 @@ data class ComposeRuleTestContext(val cr: ComposeContentTestRule) {
     return "log: $log\n${composeTreeString()}"
   }
 
-  private fun composeTreeString(): String {
+  fun composeTreeString(): String {
     val oldStream = ShadowLog.stream
     val baos = ByteArrayOutputStream()
     try {
@@ -40,5 +42,15 @@ data class ComposeRuleTestContext(val cr: ComposeContentTestRule) {
           context.fn()
         }
       }
+
+    fun <T> composeEval(fn: ComposeRuleTestContext.() -> T): T = extract {
+      // SAFF: DUP above
+      createComposeRule().wrap { cr ->
+        val context = ComposeRuleTestContext(cr)
+        Checkmark.checks {
+          yield(context.fn())
+        }
+      }
+    }
   }
 }

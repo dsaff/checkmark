@@ -1,7 +1,9 @@
-import ComposeRuleTestContext.Companion.composeTest
+package test.net.saff.checkmark.compose
+
 import androidx.compose.material.Text
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.onNodeWithText
+import net.saff.checkmark.compose.ComposeRuleTestContext.Companion.composeTest
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner

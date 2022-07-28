@@ -15,8 +15,6 @@ limitations under the License.
  */
 @file:Suppress("UnstableApiUsage")
 
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 buildscript {
     repositories {
         google()
@@ -28,21 +26,21 @@ buildscript {
 }
 
 plugins {
-    id("com.android.library") version "4.0.0"
+    id("com.android.library") version "7.4.0-alpha08"
     id("org.jetbrains.kotlin.android")
 }
 
-// SAFF: warnings
+// SIGNAL: warnings
 android {
-    compileSdkVersion(32)
+    compileSdk = 32
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
     defaultConfig {
-        minSdkVersion(30)
-        targetSdkVersion(31)
+        minSdk = 30
+        targetSdk = 31
     }
     kotlinOptions {
         jvmTarget = "1.8"
@@ -63,7 +61,7 @@ android {
 kotlin {}
 
 dependencies {
-    implementation(project(":checkmark"))
+    implementation("net.saff.checkmark:checkmark:0.1.5")
     implementation(project(":junit-ktx"))
     implementation(kotlin("stdlib-jdk8"))
     implementation(kotlin("reflect"))
@@ -71,8 +69,9 @@ dependencies {
     implementation("org.robolectric:robolectric:4.8.1")
     implementation("org.robolectric:shadows-framework:4.8.1")
     implementation("androidx.test.espresso:espresso-core:3.4.0")
-    implementation("androidx.compose.ui:ui-test-manifest:1.3.0-alpha01")
     implementation("androidx.customview:customview-poolingcontainer:1.0.0-rc01")
+
+    debugImplementation("androidx.compose.ui:ui-test-manifest:1.3.0-alpha01")
 
     testImplementation("junit:junit:4.13.2")
     testImplementation("androidx.compose.material:material:1.3.0-alpha01")
