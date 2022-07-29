@@ -35,16 +35,9 @@ data class ComposeRuleTestContext(val cr: ComposeContentTestRule) {
   }
 
   companion object {
-    fun composeTest(fn: ComposeRuleTestContext.() -> Unit) =
-      createComposeRule().wrap { cr ->
-        val context = ComposeRuleTestContext(cr)
-        Checkmark.checks {
-          context.fn()
-        }
-      }
+    fun composeTest(fn: ComposeRuleTestContext.() -> Unit) = composeEval(fn)
 
     fun <T> composeEval(fn: ComposeRuleTestContext.() -> T): T = extract {
-      // SAFF: DUP above
       createComposeRule().wrap { cr ->
         val context = ComposeRuleTestContext(cr)
         Checkmark.checks {
