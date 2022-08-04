@@ -104,17 +104,16 @@ publishing {
     }
   }
 
-  val nexusUsername: String by project
-  val nexusPassword: String by project
+  val nexusUsername: String? by project
+  val nexusPassword: String? by project
 
   repositories {
     maven {
       // For snapshots, url = uri("https://s01.oss.sonatype.org/content/repositories/snapshots")
       url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2")
       credentials {
-        // SAFF: re-enable
-        // username = nexusUsername
-        // password = nexusPassword
+        username = nexusUsername
+        password = nexusPassword
       }
     }
   }

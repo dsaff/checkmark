@@ -14,3 +14,9 @@ gradle-app.setting
 # gradle/wrapper/gradle-wrapper.properties
 local.properties
 .idea
+checkmark/bin/main/net/saff/checkmark/Checkmark.kt
+checkmark/bin/test/test/net/saff/checkmark/CheckmarkTest.kt
+junit-ktx/bin/main/net/saff/junit/junit.kt
+junit-ktx/bin/test/test/net/saff/junit/JunitKtxTest.kt
+prettyprint/bin/main/net/saff/prettyprint/prettyprint.kt
+prettyprint/bin/test/test/net/saff/prettyprint/PrettyPrintTest.kt

@@ -9,6 +9,7 @@ pluginManagement {
     kotlin("jvm") version "1.7.0"
     kotlin("android") version "1.7.0"
     kotlin("plugin.serialization") version "1.7.0"
+    id("com.android.library") version "7.2.0"
   }
   resolutionStrategy {
     eachPlugin {

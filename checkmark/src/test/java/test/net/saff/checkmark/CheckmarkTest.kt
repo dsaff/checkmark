@@ -7,6 +7,8 @@ import net.saff.checkmark.thrown
 import net.saff.prettyprint.showWhitespace
 import org.junit.Test
 
+val checkmarkMarker = java.lang.AssertionError()
+
 class CheckmarkTest {
   @Test
   fun dontPrintFunctions() {
@@ -52,5 +54,14 @@ class CheckmarkTest {
         throw RuntimeException("foo")
       }
     }!!.message!!.check { it.contains("abc") }
+  }
+
+  @Test
+  fun onlyReturnMessageOnce() {
+    val n = "Apple sauce"
+    thrown { "Pear soup".check { it == n } }!!.let { error ->
+      error.message!!.check { it.contains("Apple") }
+      error.message!!.check { it == "[duplicate message suppressed]" }
+    }
   }
 }

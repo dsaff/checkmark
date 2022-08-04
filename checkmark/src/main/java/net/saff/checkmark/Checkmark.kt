@@ -28,6 +28,19 @@ class Checkmark {
         super.getStackTrace()
       }
     }
+
+    // IntelliJ + Gradle tends to print error messages twice, messing up the output.
+    // Therefore, only return the real error message once (yes, this could backfire, but we'll
+    // handle that when it comes)
+    var bigMessageRetrieved = false
+    override val message: String?
+      get() {
+        if (!bigMessageRetrieved) {
+          bigMessageRetrieved = true
+          return super.message
+        }
+        return "[duplicate message suppressed]"
+      }
   }
 
   private val marks = mutableListOf<() -> String>()

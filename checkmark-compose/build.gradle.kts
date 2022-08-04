@@ -30,7 +30,7 @@ plugins {
     id("org.jetbrains.kotlin.android")
 }
 
-// SIGNAL: warnings
+// SAFF: warnings
 android {
     compileSdk = 32
 

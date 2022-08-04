@@ -69,7 +69,7 @@ publishing {
     create<MavenPublication>("maven") {
       groupId = "net.saff.checkmark"
       artifactId = "checkmark"
-      version = "0.1.5"
+      version = "0.1.6"
 
       from(components["java"])
 
@@ -105,17 +105,18 @@ publishing {
     }
   }
 
-  val nexusUsername: String by project
-  val nexusPassword: String by project
+  val nexusUsername: String? by project
+  val nexusPassword: String? by project
+
+  println("nexusUsername: $nexusUsername")
 
   repositories {
     maven {
       // For snapshots, url = uri("https://s01.oss.sonatype.org/content/repositories/snapshots")
       url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2")
       credentials {
-        // SAFF: re-enable?
-//        username = nexusUsername
-//        password = nexusPassword
+        username = nexusUsername
+        password = nexusPassword
       }
     }
   }
