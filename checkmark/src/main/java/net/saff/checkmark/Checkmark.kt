@@ -35,12 +35,17 @@ class Checkmark {
     var bigMessageRetrieved = false
     override val message: String?
       get() {
+        System.out.println("big message retrieved: $bigMessageRetrieved")
         if (!bigMessageRetrieved) {
           bigMessageRetrieved = true
           return super.message
         }
         return "[duplicate message suppressed]"
       }
+
+    override fun getLocalizedMessage(): String {
+      return super.message ?: super.getLocalizedMessage()
+    }
   }
 
   private val marks = mutableListOf<() -> String>()

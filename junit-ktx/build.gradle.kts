@@ -17,7 +17,7 @@ dependencies {
     implementation(kotlin("stdlib-jdk8"))
     implementation("junit:junit:4.13.2")
     implementation(kotlin("reflect"))
-    testImplementation("net.saff.checkmark:checkmark:0.1.5")
+    testImplementation(project(":checkmark"))
 }
 
 java {
