@@ -50,7 +50,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.2.0"
+        kotlinCompilerExtensionVersion = "1.3.2"
     }
     testOptions {
         unitTests {
@@ -66,7 +66,7 @@ dependencies {
     implementation(project(":junit-ktx"))
     implementation(kotlin("stdlib-jdk8"))
     implementation(kotlin("reflect"))
-    implementation("androidx.compose.ui:ui-test-junit4:1.3.0-rc01")
+    implementation("androidx.compose.ui:ui-test-junit4:1.4.0-alpha01")
     implementation("org.robolectric:robolectric:4.8.1")
     implementation("org.robolectric:shadows-framework:4.8.1")
     implementation("androidx.test.espresso:espresso-core:3.5.0-beta01")
