@@ -6,15 +6,11 @@ import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.printToLog
+import androidx.compose.ui.test.printToString
 import net.saff.checkmark.Checkmark
 import net.saff.junit.extract
 import net.saff.junit.wrap
-import org.robolectric.shadows.ShadowLog
-import java.io.ByteArrayOutputStream
-import java.io.PrintStream
 
 data class ComposeRuleTestContext<T : ComposeTestRule>(val cr: T) {
     val log = mutableListOf<String>()
@@ -23,20 +19,12 @@ data class ComposeRuleTestContext<T : ComposeTestRule>(val cr: T) {
         return "log: $log\n${composeTreeString()}"
     }
 
-    fun composeTreeString(): String {
-        val oldStream = ShadowLog.stream
-        val baos = ByteArrayOutputStream()
-        try {
-            ShadowLog.stream = PrintStream(baos)
-            try {
-                cr.onAllNodes(isRoot()).printToLog("TAG", Int.MAX_VALUE)
-            } catch (e: Throwable) {
-                return "ERROR while computing compose tree string: ${e.message}"
-            }
-        } finally {
-            ShadowLog.stream = oldStream
+    private fun composeTreeString(): String {
+        return try {
+            cr.onAllNodes(isRoot()).printToString(Int.MAX_VALUE)
+        } catch (e: Throwable) {
+            "ERROR while computing compose tree string: ${e.message}"
         }
-        return baos.toString()
     }
 
     fun click(text: String) {

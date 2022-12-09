@@ -66,16 +66,16 @@ dependencies {
     implementation(project(":junit-ktx"))
     implementation(kotlin("stdlib-jdk8"))
     implementation(kotlin("reflect"))
-    implementation("androidx.compose.ui:ui-test-junit4:1.4.0-alpha01")
-    implementation("org.robolectric:robolectric:4.8.1")
-    implementation("org.robolectric:shadows-framework:4.8.1")
-    implementation("androidx.test.espresso:espresso-core:3.5.0-beta01")
+    // SAFF: upgrades?
+    implementation("androidx.compose.ui:ui-test-junit4:1.4.0-alpha03")
+    testImplementation("org.robolectric:robolectric:4.9")
+    implementation("androidx.test.espresso:espresso-core:3.5.0")
     implementation("androidx.customview:customview-poolingcontainer:1.0.0")
 
-    debugImplementation("androidx.compose.ui:ui-test-manifest:1.3.0-rc01")
+    debugImplementation("androidx.compose.ui:ui-test-manifest:1.4.0-alpha03")
 
     testImplementation("junit:junit:4.13.2")
-    testImplementation("androidx.compose.material:material:1.3.0-rc01")
+    testImplementation("androidx.compose.material:material:1.4.0-alpha03")
     testImplementation("androidx.arch.core:core-runtime:2.1.0")
-    testImplementation("androidx.activity:activity-compose:1.6.0")
+    testImplementation("androidx.activity:activity-compose:1.6.1")
 }
