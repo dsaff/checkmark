@@ -1,5 +1,6 @@
 package net.saff.checkmark.compose
 
+import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.isRoot
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
@@ -13,7 +14,7 @@ import net.saff.junit.extract
 import net.saff.junit.wrap
 
 data class ComposeRuleTestContext<T : ComposeTestRule>(val cr: T) {
-    val log = mutableListOf<String>()
+    private val log = mutableListOf<String>()
 
     override fun toString(): String {
         return "log: $log\n${composeTreeString()}"
@@ -27,8 +28,10 @@ data class ComposeRuleTestContext<T : ComposeTestRule>(val cr: T) {
         }
     }
 
+    fun SemanticsNodeInteraction.clickVisible() = assertIsDisplayed().performClick()
+
     fun click(text: String) {
-        cr.onNodeWithText(text).assertIsDisplayed().performClick()
+        cr.onNodeWithText(text).clickVisible()
     }
 
     companion object {

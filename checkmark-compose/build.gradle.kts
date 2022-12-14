@@ -66,7 +66,6 @@ dependencies {
     implementation(project(":junit-ktx"))
     implementation(kotlin("stdlib-jdk8"))
     implementation(kotlin("reflect"))
-    // SAFF: upgrades?
     implementation("androidx.compose.ui:ui-test-junit4:1.4.0-alpha03")
     testImplementation("org.robolectric:robolectric:4.9")
     implementation("androidx.test.espresso:espresso-core:3.5.0")
