@@ -14,10 +14,12 @@ import net.saff.junit.extract
 import net.saff.junit.wrap
 
 data class ComposeRuleTestContext<T : ComposeTestRule>(val cr: T) {
-    private val log = mutableListOf<String>()
+    val logs = mutableListOf<String>()
+
+    fun log(message: String) = logs.add(message)
 
     override fun toString(): String {
-        return "log: $log\n${composeTreeString()}"
+        return "log: $logs\n${composeTreeString()}"
     }
 
     private fun composeTreeString(): String {
