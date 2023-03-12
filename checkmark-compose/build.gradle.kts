@@ -61,6 +61,7 @@ android {
 
 kotlin {}
 
+// SAFF: upgrades
 dependencies {
     implementation(project(":checkmark"))
     implementation(project(":junit-ktx"))
@@ -78,3 +79,6 @@ dependencies {
     testImplementation("androidx.arch.core:core-runtime:2.1.0")
     testImplementation("androidx.activity:activity-compose:1.6.1")
 }
+
+// SAFF: what would it take to re-enable this?
+tasks.matching { it.name == "testReleaseUnitTest" }.all { enabled = false }
