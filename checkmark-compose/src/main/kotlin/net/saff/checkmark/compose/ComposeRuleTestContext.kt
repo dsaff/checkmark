@@ -9,6 +9,8 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.printToString
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import net.saff.checkmark.Checkmark
 import net.saff.junit.extract
 import net.saff.junit.wrap
@@ -37,8 +39,9 @@ data class ComposeRuleTestContext<T : ComposeTestRule>(val cr: T) {
     }
 
     companion object {
-        fun composeTest(fn: ComposeRuleTestContext<ComposeContentTestRule>.() -> Unit) =
-            composeEval(fn)
+        @OptIn(ExperimentalCoroutinesApi::class)
+        fun composeTest(fn: suspend ComposeRuleTestContext<ComposeContentTestRule>.() -> Unit) =
+            composeEval { runTest { fn() } }
 
         fun <T> composeEval(fn: ComposeRuleTestContext<ComposeContentTestRule>.() -> T): T {
             val rule = createComposeRule()
