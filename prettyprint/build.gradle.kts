@@ -77,7 +77,7 @@ publishing {
 
       pom {
         name.set("checkmark")
-        description.set("Pretty-printing for debuggin and assertions")
+        description.set("Pretty-printing for debugging and assertions")
         url.set("https://github.com/dsaff/checkmark")
 
         licenses {
