@@ -44,8 +44,7 @@ data class ComposeRuleTestContext<T : ComposeTestRule>(val cr: T) {
             composeEval { runTest { fn() } }
 
         fun <T> composeEval(fn: ComposeRuleTestContext<ComposeContentTestRule>.() -> T): T {
-            val rule = createComposeRule()
-            return rule.composeEval(fn)
+            return createComposeRule().composeEval(fn)
         }
 
         fun <T, U : ComposeTestRule> U.composeEval(

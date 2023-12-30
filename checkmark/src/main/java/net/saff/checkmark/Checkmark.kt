@@ -19,7 +19,7 @@ import net.saff.prettyprint.cleanPairsForDisplay
 
 class Checkmark {
   class Failure(s: String, e: Throwable? = null) :
-    java.lang.RuntimeException(e?.message?.let { m -> m + "\n" + s } ?: s, e) {
+    AssertionError(e?.message?.let { m -> m + "\n" + s } ?: s, e) {
     override fun getStackTrace(): Array<StackTraceElement> {
       val causeHere = cause
       return if (causeHere != null) {
