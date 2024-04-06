@@ -18,10 +18,8 @@ import net.saff.junit.wrap
 data class ComposeRuleTestContext<T : ComposeTestRule>(val cr: T) {
     val logs = mutableListOf<String>()
 
-    fun log(message: String) = logs.add(message)
-
     override fun toString(): String {
-        return "log: $logs\n${composeTreeString()}"
+        return "log: ${logs.map { "\n    $it" }}\n${composeTreeString()}"
     }
 
     private fun composeTreeString(): String {

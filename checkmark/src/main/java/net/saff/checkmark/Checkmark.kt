@@ -36,7 +36,7 @@ class Checkmark {
     override val message: String?
       get() {
         System.out.println("big message retrieved: $bigMessageRetrieved")
-        if (!bigMessageRetrieved) {
+        if (!bigMessageRetrieved || !suppressDuplicateMessages) {
           bigMessageRetrieved = true
           return super.message
         }
@@ -135,6 +135,8 @@ class Checkmark {
       }
       return this
     }
+
+    var suppressDuplicateMessages = true
   }
 }
 

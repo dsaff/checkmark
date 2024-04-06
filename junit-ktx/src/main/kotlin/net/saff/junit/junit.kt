@@ -3,6 +3,9 @@ package net.saff.junit
 import org.junit.rules.TestRule
 import org.junit.runner.Description
 import org.junit.runners.model.Statement
+import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
+import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
+import kotlin.coroutines.resume
 
 fun <T : TestRule, U> T.wrap(fn: (T) -> U): U {
     return extract {
@@ -11,6 +14,13 @@ fun <T : TestRule, U> T.wrap(fn: (T) -> U): U {
                 yield(fn(this@wrap))
             }
         }, Description.EMPTY).evaluate()
+    }
+}
+
+suspend fun <T : TestRule> T.scoped(): T {
+    return suspendCoroutineUninterceptedOrReturn { cont ->
+        wrap { cont.resume(this@scoped) }
+        COROUTINE_SUSPENDED
     }
 }
 
