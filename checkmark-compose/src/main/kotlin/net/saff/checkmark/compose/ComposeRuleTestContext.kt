@@ -12,8 +12,10 @@ import androidx.compose.ui.test.printToString
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import net.saff.checkmark.Checkmark
+import net.saff.junit.aura
 import net.saff.junit.extract
 import net.saff.junit.wrap
+import kotlin.coroutines.resume
 
 data class ComposeRuleTestContext<T : ComposeTestRule>(val cr: T) {
     val logs = mutableListOf<String>()
@@ -30,20 +32,24 @@ data class ComposeRuleTestContext<T : ComposeTestRule>(val cr: T) {
         }
     }
 
-    fun SemanticsNodeInteraction.clickVisible() = assertIsDisplayed().performClick()
-
     fun click(text: String) {
         cr.onNodeWithText(text).clickVisible()
     }
 
     companion object {
+        suspend fun composeAura() = createComposeRule().composeAura()
+
         @OptIn(ExperimentalCoroutinesApi::class)
         fun composeTest(fn: suspend ComposeRuleTestContext<ComposeContentTestRule>.() -> Unit) =
             composeEval { runTest { fn() } }
 
+        // SAFF: use scoped?
         fun <T> composeEval(fn: ComposeRuleTestContext<ComposeContentTestRule>.() -> T): T {
             return createComposeRule().composeEval(fn)
         }
+
+        suspend fun <U : ComposeTestRule> U.composeAura() =
+            aura { this@composeAura.composeEval { resume(this@composeAura) } }
 
         fun <T, U : ComposeTestRule> U.composeEval(
             fn: ComposeRuleTestContext<U>.() -> T
@@ -57,5 +63,7 @@ data class ComposeRuleTestContext<T : ComposeTestRule>(val cr: T) {
                 }
             }
         }
+
+        fun SemanticsNodeInteraction.clickVisible() = assertIsDisplayed().performClick()
     }
 }
