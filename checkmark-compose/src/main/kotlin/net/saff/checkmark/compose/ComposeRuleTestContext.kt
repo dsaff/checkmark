@@ -12,8 +12,8 @@ import androidx.compose.ui.test.printToString
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import net.saff.checkmark.Checkmark
-import net.saff.junit.aura
 import net.saff.junit.extract
+import net.saff.junit.ring
 import net.saff.junit.wrap
 import kotlin.coroutines.resume
 
@@ -37,7 +37,7 @@ data class ComposeRuleTestContext<T : ComposeTestRule>(val cr: T) {
     }
 
     companion object {
-        suspend fun composeAura() = createComposeRule().composeAura()
+        suspend fun composeRing() = createComposeRule().composeRing()
 
         @OptIn(ExperimentalCoroutinesApi::class)
         fun composeTest(fn: suspend ComposeRuleTestContext<ComposeContentTestRule>.() -> Unit) =
@@ -48,8 +48,8 @@ data class ComposeRuleTestContext<T : ComposeTestRule>(val cr: T) {
             return createComposeRule().composeEval(fn)
         }
 
-        suspend fun <U : ComposeTestRule> U.composeAura() =
-            aura { this@composeAura.composeEval { resume(this@composeAura) } }
+        suspend fun <U : ComposeTestRule> U.composeRing() =
+            ring { this@composeRing.composeEval { resume(this@composeRing) } }
 
         fun <T, U : ComposeTestRule> U.composeEval(
             fn: ComposeRuleTestContext<U>.() -> T

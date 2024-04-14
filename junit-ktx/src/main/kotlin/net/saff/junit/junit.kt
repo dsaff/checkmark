@@ -4,7 +4,10 @@ import org.junit.rules.TestRule
 import org.junit.runner.Description
 import org.junit.runners.model.Statement
 import kotlin.coroutines.Continuation
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.intrinsics.COROUTINE_SUSPENDED
+import kotlin.coroutines.intrinsics.startCoroutineUninterceptedOrReturn
 import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
 import kotlin.coroutines.resume
 
@@ -20,15 +23,35 @@ fun <T : TestRule, U> T.wrap(fn: (T) -> U): U {
 
 fun rule(fn: (Statement) -> Statement) = TestRule { base, _ -> fn(base) }
 
-suspend inline fun <T> aura(crossinline block: Continuation<T>.() -> Unit): T {
+object RunningInRings : CoroutineContext.Key<RunningInRings>, CoroutineContext.Element {
+    override val key: CoroutineContext.Key<*>
+        get() = this
+
+    override fun toString(): String = "RunningInRings"
+}
+
+// SAFF: rename to rings??
+fun rings(fn: suspend () -> Unit) {
+    fn.startCoroutineUninterceptedOrReturn(object : Continuation<Any> {
+        override val context: CoroutineContext
+            get() = EmptyCoroutineContext + RunningInRings
+
+        override fun resumeWith(result: Result<Any>) {
+            result.getOrThrow()
+        }
+    })
+}
+
+suspend inline fun <T> ring(crossinline block: Continuation<T>.() -> Unit): T {
     return suspendCoroutineUninterceptedOrReturn { cont ->
+        check(cont.context[RunningInRings] != null)
         cont.block()
         COROUTINE_SUSPENDED
     }
 }
 
-suspend fun <T : TestRule> T.scoped(): T {
-    return aura { wrap { resume(this@scoped) } }
+suspend fun <T : TestRule> T.ringed(): T {
+    return ring { wrap { resume(this@ringed) } }
 }
 
 interface ExtractScope<T> {
