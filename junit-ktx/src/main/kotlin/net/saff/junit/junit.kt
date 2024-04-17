@@ -31,7 +31,6 @@ object RunningInRings : CoroutineContext.Key<RunningInRings>, CoroutineContext.E
     override fun toString(): String = "RunningInRings"
 }
 
-// SAFF: rename to rings??
 fun rings(fn: suspend () -> Unit) {
     fn.startCoroutineUninterceptedOrReturn(object : Continuation<Any> {
         override val context: CoroutineContext
