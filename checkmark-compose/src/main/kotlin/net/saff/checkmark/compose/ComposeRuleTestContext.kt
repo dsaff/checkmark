@@ -12,6 +12,7 @@ import androidx.compose.ui.test.printToString
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import net.saff.checkmark.Checkmark
+import net.saff.checkmark.compose.ComposeRuleTestContext.Companion.clickVisible
 import net.saff.junit.extract
 import net.saff.junit.ring
 import net.saff.junit.wrap
@@ -32,9 +33,7 @@ data class ComposeRuleTestContext<T : ComposeTestRule>(val cr: T) {
         }
     }
 
-    fun click(text: String) {
-        cr.onNodeWithText(text).clickVisible()
-    }
+    fun click(text: String) = cr.click(text)
 
     companion object {
         suspend fun composeRing() = createComposeRule().composeRing()
@@ -43,10 +42,8 @@ data class ComposeRuleTestContext<T : ComposeTestRule>(val cr: T) {
         fun composeTest(fn: suspend ComposeRuleTestContext<ComposeContentTestRule>.() -> Unit) =
             composeEval { runTest { fn() } }
 
-        // SAFF: use scoped?
-        fun <T> composeEval(fn: ComposeRuleTestContext<ComposeContentTestRule>.() -> T): T {
-            return createComposeRule().composeEval(fn)
-        }
+        fun <T> composeEval(fn: ComposeRuleTestContext<ComposeContentTestRule>.() -> T) =
+            createComposeRule().composeEval(fn)
 
         suspend fun <U : ComposeTestRule> U.composeRing() =
             ring { this@composeRing.composeEval { resume(this@composeRing) } }
@@ -67,3 +64,5 @@ data class ComposeRuleTestContext<T : ComposeTestRule>(val cr: T) {
         fun SemanticsNodeInteraction.clickVisible() = assertIsDisplayed().performClick()
     }
 }
+
+fun ComposeTestRule.click(text: String) = onNodeWithText(text).clickVisible()

@@ -3,6 +3,7 @@ package net.saff.junit
 import org.junit.rules.TestRule
 import org.junit.runner.Description
 import org.junit.runners.model.Statement
+import java.io.File
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
@@ -48,6 +49,12 @@ suspend inline fun <T> ring(crossinline block: Continuation<T>.() -> Unit): T {
         cont.block()
         COROUTINE_SUSPENDED
     }
+}
+
+suspend fun tempFolder() = ring {
+    val newFile = File.createTempFile("pre", "txt")
+    resume(newFile)
+    newFile.delete()
 }
 
 suspend fun <T : TestRule> T.ringed(): T {
