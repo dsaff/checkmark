@@ -15,7 +15,10 @@ limitations under the License.
  */
 package net.saff.checkmark
 
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
 import net.saff.prettyprint.cleanPairsForDisplay
+import java.io.File
 
 class Checkmark {
   class Failure(s: String, e: Throwable? = null) :
@@ -102,6 +105,20 @@ class Checkmark {
     private fun <T> allDebugOutput(
       receiver: T, cm: Checkmark, eval: Checkmark.(T) -> Boolean
     ): String {
+      // SAFF: cheating
+      if (useJson) {
+          // SAFF: indentation is annoying here
+        // SAFF: this is definitely wrong
+          val jsonObject = JsonObject(
+              mapOf(
+                  "actual" to JsonPrimitive("A"),
+                  "marked" to JsonPrimitive("B")
+              )
+          )
+          File("something.json").writeText(jsonObject.toString())
+        return "[more: something.json]"
+      }
+
       val reports = buildList {
         add("actual" to receiver)
         addAll(extractClosureFields(eval))
@@ -136,6 +153,17 @@ class Checkmark {
       return this
     }
 
+      // SAFF: choose an indentation style
+    fun <T> useJson(fn: () -> T): T {
+      useJson = true
+      try {
+        return fn()
+      } finally {
+        useJson = false
+      }
+    }
+
+    private var useJson = false
     var suppressDuplicateMessages = true
   }
 }

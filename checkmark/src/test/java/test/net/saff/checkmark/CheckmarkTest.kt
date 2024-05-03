@@ -1,11 +1,17 @@
 package test.net.saff.checkmark
 
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import net.saff.checkmark.Checkmark
 import net.saff.checkmark.Checkmark.Companion.check
 import net.saff.checkmark.Checkmark.Companion.checkCompletes
 import net.saff.checkmark.Checkmark.Companion.checks
+import net.saff.checkmark.Checkmark.Companion.fail
 import net.saff.checkmark.thrown
 import net.saff.prettyprint.showWhitespace
 import org.junit.Test
+import java.io.File
 
 val checkmarkMarker = java.lang.AssertionError()
 
@@ -32,6 +38,22 @@ class CheckmarkTest {
     thrown { "A".check { it == mark("B") } }!!.message!!.showWhitespace().check {
       it == expect
     }
+  }
+
+  @Test
+  fun jsonOutputWithMark() {
+    val message = Checkmark.useJson { thrown { "A".check { it == mark("B") } }!!.message!! }
+
+    val matcher = "\\[more: (.*\\.json)]".toPattern().matcher(message)
+    val jsonFile = matcher.check {
+      // SAFF: this outputs both marked and message.  Only one is needed
+      mark(message)
+      it.find()
+    }.group(1) ?: fail(message)
+    val element = Json.parseToJsonElement(File(jsonFile).readText())
+    // SAFF: DUP?
+    element.jsonObject.get("actual").check { it?.jsonPrimitive?.content == "A" }
+    element.jsonObject.get("marked").check { it?.jsonPrimitive?.content == "B" }
   }
 
   @Test
