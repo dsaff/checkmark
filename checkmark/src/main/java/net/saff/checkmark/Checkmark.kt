@@ -114,7 +114,7 @@ class Checkmark {
       }
 
       if (useJson) {
-        // SAFF: indentation
+        // SAFF: indentation (follow https://developer.android.com/kotlin/style-guide)
         // SAFF: should this have a special case for only actual, like below?
           // SAFF: indentation is annoying here
         // SAFF: not all values are going to be strings, are they?
