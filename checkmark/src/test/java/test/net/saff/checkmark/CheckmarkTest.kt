@@ -43,6 +43,15 @@ class CheckmarkTest {
     }
   }
 
+
+  @Test
+  fun onlyActual() {
+    // SAFF: DUP above?
+    val expect = "Failed assertion: A".trimMargin().showWhitespace()
+    thrown { "A".check { it == "B" } }!!.message!!.showWhitespace().check { it == expect }
+  }
+
+
   @Test
   fun jsonOutputWithMark() {
     val message = Checkmark.useJson { thrown { "A".check { it == mark("B") } }!!.message!! }

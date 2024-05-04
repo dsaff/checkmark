@@ -113,8 +113,8 @@ class Checkmark {
         addAll(cm.marks.map { "marked" to it() })
       }
 
-      // SAFF: cheating
       if (useJson) {
+        // SAFF: indentation
         // SAFF: should this have a special case for only actual, like below?
           // SAFF: indentation is annoying here
         // SAFF: not all values are going to be strings, are they?
