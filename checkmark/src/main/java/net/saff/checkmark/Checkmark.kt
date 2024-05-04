@@ -19,6 +19,8 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import net.saff.prettyprint.cleanPairsForDisplay
 import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
 
 class Checkmark {
   class Failure(s: String, e: Throwable? = null) :
@@ -105,25 +107,29 @@ class Checkmark {
     private fun <T> allDebugOutput(
       receiver: T, cm: Checkmark, eval: Checkmark.(T) -> Boolean
     ): String {
-      // SAFF: cheating
-      if (useJson) {
-          // SAFF: indentation is annoying here
-        // SAFF: this is definitely wrong
-          val jsonObject = JsonObject(
-              mapOf(
-                  "actual" to JsonPrimitive("A"),
-                  "marked" to JsonPrimitive("B")
-              )
-          )
-          File("something.json").writeText(jsonObject.toString())
-        return "[more: something.json]"
-      }
-
       val reports = buildList {
         add("actual" to receiver)
         addAll(extractClosureFields(eval))
         addAll(cm.marks.map { "marked" to it() })
       }
+
+      // SAFF: cheating
+      if (useJson) {
+        // SAFF: should this have a special case for only actual, like below?
+          // SAFF: indentation is annoying here
+        // SAFF: not all values are going to be strings, are they?
+          val jsonObject = JsonObject(reports.associate { it.first to JsonPrimitive(it.second.toString()) })
+        val dateString = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+        val file = File("/tmp/compare_$dateString.json")
+        // Create a uniquely named file with a timestamp in the filename in /tmp
+
+
+        // SAFF: something.json is not always the right value
+          file.writeText(jsonObject.toString())
+        return "[more: $file]"
+      }
+
+      // SAFF: match all of this with above
       return if (reports.size == 1) {
         reports[0].second.toString().forCleanDisplay()
       } else {

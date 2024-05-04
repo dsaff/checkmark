@@ -3,6 +3,9 @@ package test.net.saff.checkmark
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import net.saff.befuzz.chooseString
+import net.saff.befuzz.exploreTreeFates
+import net.saff.befuzz.theory
 import net.saff.checkmark.Checkmark
 import net.saff.checkmark.Checkmark.Companion.check
 import net.saff.checkmark.Checkmark.Companion.checkCompletes
@@ -50,10 +53,36 @@ class CheckmarkTest {
       mark(message)
       it.find()
     }.group(1) ?: fail(message)
+    jsonFile.check { it.startsWith("/tmp") }
     val element = Json.parseToJsonElement(File(jsonFile).readText())
     // SAFF: DUP?
     element.jsonObject.get("actual").check { it?.jsonPrimitive?.content == "A" }
     element.jsonObject.get("marked").check { it?.jsonPrimitive?.content == "B" }
+  }
+
+
+  @Test
+  fun jsonOutputWithMarkTheory() {
+    // SAFF: DUP above
+    theory(exploreTreeFates(1)) {
+      val expectedActual = chooseString("actual?")
+      val expectedMarked = chooseString("marked?")
+      if (expectedActual != expectedMarked) {
+        val message =
+          Checkmark.useJson { thrown { expectedActual.check { it == mark(expectedMarked) } }!!.message!! }
+
+        val matcher = "\\[more: (.*\\.json)]".toPattern().matcher(message)
+        val jsonFile = matcher.check {
+          // SAFF: this outputs both marked and message.  Only one is needed
+          mark(message)
+          it.find()
+        }.group(1) ?: fail(message)
+        val element = Json.parseToJsonElement(File(jsonFile).readText())
+        // SAFF: DUP?
+        element.jsonObject.get("actual").check { it?.jsonPrimitive?.content == expectedActual }
+        element.jsonObject.get("marked").check { it?.jsonPrimitive?.content == expectedMarked }
+      }
+    }
   }
 
   @Test
