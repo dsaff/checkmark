@@ -48,7 +48,7 @@ class Checkmark {
                 return "[duplicate message suppressed]"
             }
 
-        override fun getLocalizedMessage(): String {
+        override fun getLocalizedMessage(): String? {
             return super.message ?: super.getLocalizedMessage()
         }
     }
@@ -60,6 +60,7 @@ class Checkmark {
         return note
     }
 
+    // SAFF: warnings?
     fun mark(fn: () -> String) {
         marks.add(fn)
     }
@@ -114,7 +115,6 @@ class Checkmark {
             }
 
             if (useJson) {
-                // SAFF: indentation (follow https://developer.android.com/kotlin/style-guide)
                 // SAFF: should this have a special case for only actual, like below?
                 // SAFF: indentation is annoying here
                 // SAFF: not all values are going to be strings, are they?

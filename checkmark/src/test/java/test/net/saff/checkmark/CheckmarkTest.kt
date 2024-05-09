@@ -43,6 +43,25 @@ class CheckmarkTest {
         }
     }
 
+    // SAFF: DUP?
+    @Test
+    fun outputWithMarkFn() {
+        val expect = """
+        |Failed assertion: 
+        |- actual: A
+        |- marked: B
+    """.trimMargin().showWhitespace()
+        thrown {
+            "A".check {
+                var toMark = "C"
+                mark { toMark }
+                toMark = "B"
+                it == "B"
+            }
+        }!!.message!!.showWhitespace().check {
+            it == expect
+        }
+    }
 
     @Test
     fun onlyActual() {
