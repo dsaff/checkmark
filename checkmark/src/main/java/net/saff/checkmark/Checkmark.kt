@@ -21,6 +21,7 @@ import net.saff.prettyprint.cleanPairsForDisplay
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.Locale
 
 class Checkmark {
     class Failure(s: String, e: Throwable? = null) :
@@ -118,9 +119,11 @@ class Checkmark {
                 // SAFF: should this have a special case for only actual, like below?
                 // SAFF: indentation is annoying here
                 // SAFF: not all values are going to be strings, are they?
-                val jsonObject =
-                    JsonObject(reports.associate { it.first to JsonPrimitive(it.second.toString()) })
-                val dateString = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+                val contentMap =
+                    reports.associate { it.first to JsonPrimitive(it.second.toString()) }
+                val jsonObject = JsonObject(contentMap)
+                val format = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US)
+                val dateString = format.format(Date())
                 val file = File("/tmp/compare_$dateString.json")
                 // Create a uniquely named file with a timestamp in the filename in /tmp
 
