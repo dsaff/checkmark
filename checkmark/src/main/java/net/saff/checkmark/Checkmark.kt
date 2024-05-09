@@ -61,7 +61,6 @@ class Checkmark {
         return note
     }
 
-    // SAFF: warnings?
     fun mark(fn: () -> String) {
         marks.add(fn)
     }
@@ -116,6 +115,10 @@ class Checkmark {
             }
 
             if (useJson) {
+                if (reports.size == 1) {
+                    // SAFF: DUP below
+                    return reports[0].second.toString().forCleanDisplay()
+                }
                 // SAFF: should this have a special case for only actual, like below?
                 // SAFF: indentation is annoying here
                 // SAFF: not all values are going to be strings, are they?
@@ -129,6 +132,7 @@ class Checkmark {
 
                 // SAFF: something.json is not always the right value
                 file.writeText(jsonObject.toString())
+                // SAFF: include _something_?
                 return "[more: $file]"
             }
 

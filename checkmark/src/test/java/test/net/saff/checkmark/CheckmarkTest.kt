@@ -6,11 +6,11 @@ import kotlinx.serialization.json.jsonPrimitive
 import net.saff.befuzz.chooseString
 import net.saff.befuzz.exploreTreeFates
 import net.saff.befuzz.theory
-import net.saff.checkmark.Checkmark
 import net.saff.checkmark.Checkmark.Companion.check
 import net.saff.checkmark.Checkmark.Companion.checkCompletes
 import net.saff.checkmark.Checkmark.Companion.checks
 import net.saff.checkmark.Checkmark.Companion.fail
+import net.saff.checkmark.Checkmark.Companion.useJson
 import net.saff.checkmark.thrown
 import net.saff.prettyprint.showWhitespace
 import org.junit.Test
@@ -70,10 +70,9 @@ class CheckmarkTest {
         thrown { "A".check { it == "B" } }!!.message!!.showWhitespace().check { it == expect }
     }
 
-
     @Test
     fun jsonOutputWithMark() {
-        val message = Checkmark.useJson { thrown { "A".check { it == mark("B") } }!!.message!! }
+        val message = useJson { thrown { "A".check { it == mark("B") } }!!.message!! }
 
         val matcher = "\\[more: (.*\\.json)]".toPattern().matcher(message)
         val jsonFile = matcher.check {
@@ -88,6 +87,13 @@ class CheckmarkTest {
         element.jsonObject.get("marked").check { it?.jsonPrimitive?.content == "B" }
     }
 
+    @Test
+    fun jsonOutputWithOnlyActual() {
+        // SAFF: but json when the value is more interesting
+        val expect = "Failed assertion: A".trimMargin().showWhitespace()
+        useJson { thrown { "A".check { it == "B" } } }!!.message!!.showWhitespace()
+            .check { it == expect }
+    }
 
     @Test
     fun jsonOutputWithMarkTheory() {
@@ -97,7 +103,7 @@ class CheckmarkTest {
             val expectedMarked = chooseString("marked?")
             if (expectedActual != expectedMarked) {
                 val message =
-                    Checkmark.useJson { thrown { expectedActual.check { it == mark(expectedMarked) } }!!.message!! }
+                    useJson { thrown { expectedActual.check { it == mark(expectedMarked) } }!!.message!! }
 
                 val matcher = "\\[more: (.*\\.json)]".toPattern().matcher(message)
                 val jsonFile = matcher.check {
