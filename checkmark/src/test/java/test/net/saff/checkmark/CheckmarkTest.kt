@@ -167,10 +167,18 @@ class CheckmarkTest {
 
     @Test
     fun onlyReturnMessageOnce() {
-        val n = "Apple sauce"
+        val n = "Apple\nsauce"
         thrown { "Pear soup".check { it == n } }!!.let { error ->
             error.message!!.check { it.contains("Apple") }
             error.message!!.check { it == "[duplicate message suppressed]" }
+        }
+    }
+
+    @Test
+    fun onlySuppressMultipleLines() {
+        thrown { "Pear soup".check { it == "Apple sauce" } }!!.let { error ->
+            error.message!!.check { it.contains("Pear") }
+            error.message!!.check { it.contains("Pear") }
         }
     }
 }

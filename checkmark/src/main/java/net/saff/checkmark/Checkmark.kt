@@ -37,7 +37,6 @@ class Checkmark {
             }
         }
 
-        // SAFF: can we avoid this when message isn't big?
         // IntelliJ + Gradle tends to print error messages twice, messing up the output.
         // Therefore, only return the real error message once (yes, this could backfire, but we'll
         // handle that when it comes)
@@ -46,8 +45,11 @@ class Checkmark {
             get() {
                 System.out.println("big message retrieved: $bigMessageRetrieved")
                 if (!bigMessageRetrieved || !suppressDuplicateMessages) {
-                    bigMessageRetrieved = true
-                    return super.message
+                    val message = super.message
+                    if (message?.contains("\n") == true) {
+                        bigMessageRetrieved = true
+                    }
+                    return message
                 }
                 return "[duplicate message suppressed]"
             }
