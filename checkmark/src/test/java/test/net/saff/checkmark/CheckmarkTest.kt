@@ -85,13 +85,36 @@ class CheckmarkTest {
     }
 
     @Test
+    fun jsonOutputDontRepeatMark() {
+        val message = useJson {
+            thrown {
+                val note = "B"
+                "A".check { it == mark(note) }
+            }!!.message!!
+        }
+
+        val matcher = message.jsonMatcher()
+        val jsonFile = matcher.check {
+            // SAFF: this outputs both marked and message.  Only one is needed
+            mark(message)
+            it.find()
+        }.group(1) ?: fail(message)
+        jsonFile.check { it.startsWith("/tmp") }
+        val element = Json.parseToJsonElement(File(jsonFile).readText())
+        // SAFF: DUP?
+        element.jsonObject["actual"].check { it?.jsonPrimitive?.content == "A" }
+        element.jsonObject["note"].check { it?.jsonPrimitive?.content == "B" }
+        element.jsonObject.check { !it.contains("marked") }
+    }
+
+    @Test
     fun jsonOutputWithList() {
         // SAFF: DUP above?
         val message =
             useJson { thrown { listOf("A").check { it == mark(listOf("B", "C")) } }!!.message!! }
 
         message.check { it.contains("[A]") }
-        message.check { ! it.contains("B") }
+        message.check { !it.contains("B") }
         val matcher = message.jsonMatcher()
         val jsonFile = matcher.check {
             // SAFF: this outputs both marked and message.  Only one is needed
@@ -180,7 +203,7 @@ class CheckmarkTest {
                 // SAFF: DUP?
                 element.jsonObject["actual"]
                     .check { it?.jsonPrimitive?.content == expectedActual }
-                element.jsonObject["marked"]
+                element.jsonObject["expectedMarked"]
                     .check { it?.jsonPrimitive?.content == expectedMarked }
             }
         }

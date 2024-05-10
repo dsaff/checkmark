@@ -112,8 +112,11 @@ class Checkmark {
         ): String {
             val reports = buildList {
                 add("actual" to receiver)
-                addAll(extractClosureFields(eval))
-                addAll(cm.marks.map { "marked" to it() })
+                val elements = extractClosureFields(eval)
+                val elementMap = elements.toMap()
+                addAll(elements)
+                addAll(cm.marks.map { "marked" to it() }
+                    .filter { !elementMap.values.contains(it.second) })
             }
 
             reports.singleOrNull()?.second?.let { single ->
