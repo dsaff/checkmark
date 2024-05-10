@@ -109,6 +109,29 @@ class CheckmarkTest {
         }
     }
 
+    @Test
+    fun jsonOutputWithMap() {
+        // SAFF: DUP above?
+        val message = useJson {
+            thrown { listOf("A").check { it == mark(mapOf("B" to 2, "C" to 3)) } }!!.message!!
+        }
+
+        val matcher = "\\[more: (.*\\.json)]".toPattern().matcher(message)
+        val jsonFile = matcher.check {
+            // SAFF: this outputs both marked and message.  Only one is needed
+            mark(message)
+            it.find()
+        }.group(1) ?: fail(message)
+        jsonFile.check { it.startsWith("/tmp") }
+        val element = Json.parseToJsonElement(File(jsonFile).readText())
+        // SAFF: DUP?
+        val actualList = element.jsonObject["actual"]?.jsonArray?.toList()
+        actualList.check { it == listOf(JsonPrimitive("A")) }
+        element.jsonObject["marked"]?.jsonObject!!.check { obj ->
+            obj["B"] == JsonPrimitive("2") && obj["C"] == JsonPrimitive("3")
+        }
+    }
+
     // SAFF: should we include first line before json link?
     @Test
     fun jsonOutputWithOnlyActualButIsList() {
@@ -175,6 +198,7 @@ class CheckmarkTest {
             }
         }!!.stackTrace.toList().check { trace -> trace[0] == rootStackTrace!![0] }
     }
+    // SAFF: long
 
     @Test
     fun checkCompletesWorks() {

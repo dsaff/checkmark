@@ -103,7 +103,7 @@ class Checkmark {
                 if (field.name != "INSTANCE") {
                     field.isAccessible = true
                     val gotten = field.get(closure)
-                    if (!(gotten is Function<*>)) {
+                    if (gotten !is Function<*>) {
                         add(field.name.removePrefix("\$") to gotten)
                     }
                 }
@@ -126,14 +126,11 @@ class Checkmark {
             }
 
             if (useJson) {
-                // SAFF: lists
                 // SAFF: maps
                 // SAFF: not all values are going to be strings, are they?
-                val contentMap =
-                    reports.associate {
-                        val value = it.second
-                        it.first to value.jsonSerialize()
-                    }
+                val contentMap = reports.associate {
+                    it.first to it.second.jsonSerialize()
+                }
                 val jsonObject = JsonObject(contentMap)
                 val format = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US)
                 val dateString = format.format(Date())
@@ -198,13 +195,18 @@ fun thrown(fn: () -> Any?): Throwable? {
     } catch (t: Throwable) {
         return t
     }
+    // SAFF: long
     return null
 }
 
+// SAFF: use in map serialization
 private fun Any?.jsonSerialize(): JsonElement {
-    return if (this is List<*>) {
-        JsonArray(this.map { it.jsonSerialize() })
-    } else {
-        JsonPrimitive(toString())
+    return when (this) {
+        is List<*> -> JsonArray(map { it.jsonSerialize() })
+
+        is Map<*, *> ->
+            JsonObject(mapValues { it.value.jsonSerialize() }.mapKeys { it.key.toString() })
+
+        else -> JsonPrimitive(toString())
     }
 }
