@@ -119,16 +119,9 @@ class Checkmark {
                 addAll(cm.marks.map { "marked" to it() })
             }
 
-            // SAFF: but we may still want JSON if second has structure
-            val single = reports.singleOrNull()
-            if (single != null) {
-                if (useJson) {
-                    if (single.second.jsonSerialize() is JsonPrimitive) {
-                        return single.second.orElse("null").toString().forCleanDisplay()
-                    }
-                } else {
-                    // SAFF: DUP above
-                    return single.second.orElse("null").toString().forCleanDisplay()
+            reports.singleOrNull()?.second?.let { single ->
+                if (!useJson || single.jsonSerialize() is JsonPrimitive) {
+                    return single.cleanString()
                 }
             }
 
@@ -155,6 +148,8 @@ class Checkmark {
             // SAFF: match all of this with above
             return cleanPairsForDisplay(reports)
         }
+
+        private fun Any?.cleanString() = orElse("null").toString().forCleanDisplay()
 
         private fun cleanPairsForDisplay(reports: List<Pair<String, Any?>>) =
             reports.joinToString(separator = "") {
