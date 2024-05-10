@@ -120,8 +120,17 @@ class Checkmark {
             }
 
             // SAFF: but we may still want JSON if second has structure
-            reports.singleOrNull()
-                ?.let { return it.second.orElse("null").toString().forCleanDisplay() }
+            val single = reports.singleOrNull()
+            if (single != null) {
+                if (useJson) {
+                    if (single.second.jsonSerialize() is JsonPrimitive) {
+                        return single.second.orElse("null").toString().forCleanDisplay()
+                    }
+                } else {
+                    // SAFF: DUP above
+                    return single.second.orElse("null").toString().forCleanDisplay()
+                }
+            }
 
             if (useJson) {
                 // SAFF: lists
@@ -145,14 +154,6 @@ class Checkmark {
 
             // SAFF: match all of this with above
             return cleanPairsForDisplay(reports)
-        }
-
-        private fun Any?.jsonSerialize(): JsonElement {
-            return if (this is List<*>) {
-                JsonArray(this.map { it.jsonSerialize() })
-            } else {
-                JsonPrimitive(toString())
-            }
         }
 
         private fun cleanPairsForDisplay(reports: List<Pair<String, Any?>>) =
@@ -203,4 +204,12 @@ fun thrown(fn: () -> Any?): Throwable? {
         return t
     }
     return null
+}
+
+private fun Any?.jsonSerialize(): JsonElement {
+    return if (this is List<*>) {
+        JsonArray(this.map { it.jsonSerialize() })
+    } else {
+        JsonPrimitive(toString())
+    }
 }
