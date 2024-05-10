@@ -114,11 +114,9 @@ class Checkmark {
                 addAll(cm.marks.map { "marked" to it() })
             }
 
+            reports.singleOrNull()?.let { return it.second.toString().forCleanDisplay() }
+
             if (useJson) {
-                if (reports.size == 1) {
-                    // SAFF: DUP below
-                    return reports[0].second.toString().forCleanDisplay()
-                }
                 // SAFF: should this have a special case for only actual, like below?
                 // SAFF: indentation is annoying here
                 // SAFF: not all values are going to be strings, are they?
@@ -137,11 +135,7 @@ class Checkmark {
             }
 
             // SAFF: match all of this with above
-            return if (reports.size == 1) {
-                reports[0].second.toString().forCleanDisplay()
-            } else {
-                cleanPairsForDisplay(reports)
-            }
+            return cleanPairsForDisplay(reports)
         }
 
         private fun cleanPairsForDisplay(reports: List<Pair<String, Any?>>) =
