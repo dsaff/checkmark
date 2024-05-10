@@ -119,43 +119,12 @@ class Checkmark {
                     .filter { !elementMap.values.contains(it.second) })
             }
 
-            reports.singleOrNull()?.second?.let { single ->
-                if (!useJson || single.jsonSerialize() is JsonPrimitive) {
-                    return single.cleanString()
-                }
-            }
-
-            val cleanPairsForDisplay = cleanPairsForDisplay(reports)
-            if (useJson) {
-                val jsonObject = reports.toMap().jsonSerialize()
-                val format = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US)
-                val dateString = format.format(Date())
-                val file = File("/tmp/compare_$dateString.json")
-                // Create a uniquely named file with a timestamp in the filename in /tmp
-
-                file.writeText(jsonObject.toString())
-
-                val firstLine = cleanPairsForDisplay.lines().first { it.isNotBlank() }
-                return "$firstLine [more: file://${file}]"
-            }
-
-            return cleanPairsForDisplay
+            return assembleMessage(reports)
         }
 
-        private fun Any?.cleanString() = orElse("null").toString().forCleanDisplay()
-
-        private fun cleanPairsForDisplay(reports: List<Pair<String, Any?>>) =
-            reports.joinToString(separator = "") {
-                "\n- ${it.first}: ${it.second.toString().forCleanDisplay()}"
-            }
-
-        private fun String.forCleanDisplay(): String {
-            return if (!contains("\n")) {
-                this
-            } else {
-                val margin = "  |"
-                "\n$margin${replace("\n", "\n$margin")}"
-            }
+        private fun assembleMessage(reports: List<Pair<String, Any?>>): String {
+            val assembler = if (useJson) JsonMessageAssembler() else StringMessageAssembler()
+            return assembler.assembleMessage(reports)
         }
 
         fun <T> T.checkCompletes(eval: Checkmark.(T) -> Unit): T {
@@ -179,6 +148,62 @@ class Checkmark {
 
         private var useJson = false
         var suppressDuplicateMessages = true
+    }
+}
+
+interface MessageAssembler {
+    fun assembleMessage(reports: List<Pair<String, Any?>>): String
+}
+
+// SAFF: long?
+class StringMessageAssembler : MessageAssembler {
+    override fun assembleMessage(reports: List<Pair<String, Any?>>): String {
+        reports.singleOrNull()?.second?.let { single ->
+            if (single.jsonSerialize() is JsonPrimitive) {
+                return single.cleanString()
+            }
+        }
+
+        return cleanPairsForDisplay(reports)
+    }
+}
+
+class JsonMessageAssembler : MessageAssembler {
+    override fun assembleMessage(reports: List<Pair<String, Any?>>): String {
+        // SAFF: DUP other?
+        reports.singleOrNull()?.second?.let { single ->
+            if (single.jsonSerialize() is JsonPrimitive) {
+                return single.cleanString()
+            }
+        }
+
+        val cleanPairsForDisplay = cleanPairsForDisplay(reports)
+        val jsonObject = reports.toMap().jsonSerialize()
+        val format = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US)
+        val dateString = format.format(Date())
+        val file = File("/tmp/compare_$dateString.json")
+        // Create a uniquely named file with a timestamp in the filename in /tmp
+
+        file.writeText(jsonObject.toString())
+
+        val firstLine = cleanPairsForDisplay.lines().first { it.isNotBlank() }
+        return "$firstLine [more: file://${file}]"
+    }
+}
+
+private fun Any?.cleanString() = orElse("null").toString().forCleanDisplay()
+
+private fun cleanPairsForDisplay(reports: List<Pair<String, Any?>>) =
+    reports.joinToString(separator = "") {
+        "\n- ${it.first}: ${it.second.toString().forCleanDisplay()}"
+    }
+
+private fun String.forCleanDisplay(): String {
+    return if (!contains("\n")) {
+        this
+    } else {
+        val margin = "  |"
+        "\n$margin${replace("\n", "\n$margin")}"
     }
 }
 
