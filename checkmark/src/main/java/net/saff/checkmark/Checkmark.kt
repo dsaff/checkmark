@@ -137,9 +137,10 @@ class Checkmark {
                 // Create a uniquely named file with a timestamp in the filename in /tmp
 
                 file.writeText(jsonObject.toString())
-                // SAFF: include _something_?
+                val firstLine = cleanPairsForDisplay.lines().first { it.isNotBlank() }
+                // SAFF: this should be URL
                 // SAFF: not if multi-line
-                return "$cleanPairsForDisplay [more: $file]"
+                return "$firstLine [more: file://${file}]"
             }
 
             return cleanPairsForDisplay

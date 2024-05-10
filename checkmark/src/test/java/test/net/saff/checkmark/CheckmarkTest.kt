@@ -17,6 +17,7 @@ import net.saff.checkmark.thrown
 import net.saff.prettyprint.showWhitespace
 import org.junit.Test
 import java.io.File
+import java.util.regex.Matcher
 
 class CheckmarkTest {
     @Test
@@ -74,7 +75,7 @@ class CheckmarkTest {
     fun jsonOutputWithMark() {
         val message = useJson { thrown { "A".check { it == mark("B") } }!!.message!! }
 
-        val matcher = "\\[more: (.*\\.json)]".toPattern().matcher(message)
+        val matcher = message.jsonMatcher()
         val jsonFile = matcher.check {
             // SAFF: this outputs both marked and message.  Only one is needed
             mark(message)
@@ -94,7 +95,8 @@ class CheckmarkTest {
             useJson { thrown { listOf("A").check { it == mark(listOf("B", "C")) } }!!.message!! }
 
         message.check { it.contains("[A]") }
-        val matcher = "\\[more: (.*\\.json)]".toPattern().matcher(message)
+        message.check { ! it.contains("B") }
+        val matcher = message.jsonMatcher()
         val jsonFile = matcher.check {
             // SAFF: this outputs both marked and message.  Only one is needed
             mark(message)
@@ -117,7 +119,7 @@ class CheckmarkTest {
             thrown { listOf("A").check { it == mark(mapOf("B" to 2, "C" to 3)) } }!!.message!!
         }
 
-        val matcher = "\\[more: (.*\\.json)]".toPattern().matcher(message)
+        val matcher = message.jsonMatcher()
         val jsonFile = matcher.check {
             // SAFF: this outputs both marked and message.  Only one is needed
             mark(message)
@@ -140,7 +142,7 @@ class CheckmarkTest {
         val message =
             useJson { thrown { listOf("A").check { it == listOf("B", "C") } }!!.message!! }
 
-        val matcher = "\\[more: (.*\\.json)]".toPattern().matcher(message)
+        val matcher = message.jsonMatcher()
         val jsonFile = matcher.check {
             // SAFF: this outputs both marked and message.  Only one is needed
             mark(message)
@@ -172,7 +174,7 @@ class CheckmarkTest {
                 val message =
                     useJson { thrown { expectedActual.check { it == mark(expectedMarked) } }!!.message!! }
 
-                val matcher = "\\[more: (.*\\.json)]".toPattern().matcher(message)
+                val matcher = message.jsonMatcher()
                 val jsonFile = matcher.check {
                     // SAFF: this outputs both marked and message.  Only one is needed
                     mark(message)
@@ -187,6 +189,10 @@ class CheckmarkTest {
             }
         }
     }
+
+    // SAFF: DUP callers?
+    private fun String.jsonMatcher(): Matcher =
+        "\\[more: file://(.*\\.json)]".toPattern().matcher(this)
 
     @Test
     fun meldStackTrace() {
