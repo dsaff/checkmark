@@ -1,6 +1,8 @@
 package test.net.saff.checkmark
 
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import net.saff.befuzz.chooseString
@@ -15,8 +17,6 @@ import net.saff.checkmark.thrown
 import net.saff.prettyprint.showWhitespace
 import org.junit.Test
 import java.io.File
-
-val checkmarkMarker = java.lang.AssertionError()
 
 class CheckmarkTest {
     @Test
@@ -83,8 +83,30 @@ class CheckmarkTest {
         jsonFile.check { it.startsWith("/tmp") }
         val element = Json.parseToJsonElement(File(jsonFile).readText())
         // SAFF: DUP?
-        element.jsonObject.get("actual").check { it?.jsonPrimitive?.content == "A" }
-        element.jsonObject.get("marked").check { it?.jsonPrimitive?.content == "B" }
+        element.jsonObject["actual"].check { it?.jsonPrimitive?.content == "A" }
+        element.jsonObject["marked"].check { it?.jsonPrimitive?.content == "B" }
+    }
+
+    @Test
+    fun jsonOutputWithList() {
+        // SAFF: DUP above?
+        val message =
+            useJson { thrown { listOf("A").check { it == mark(listOf("B", "C")) } }!!.message!! }
+
+        val matcher = "\\[more: (.*\\.json)]".toPattern().matcher(message)
+        val jsonFile = matcher.check {
+            // SAFF: this outputs both marked and message.  Only one is needed
+            mark(message)
+            it.find()
+        }.group(1) ?: fail(message)
+        jsonFile.check { it.startsWith("/tmp") }
+        val element = Json.parseToJsonElement(File(jsonFile).readText())
+        // SAFF: DUP?
+        val actualList = element.jsonObject["actual"]?.jsonArray?.toList()
+        actualList.check { it == listOf(JsonPrimitive("A")) }
+        element.jsonObject["marked"].check { obj ->
+            obj?.jsonArray?.toList() == listOf("B", "C").map { JsonPrimitive(it) }
+        }
     }
 
     @Test
@@ -113,9 +135,9 @@ class CheckmarkTest {
                 }.group(1) ?: fail(message)
                 val element = Json.parseToJsonElement(File(jsonFile).readText())
                 // SAFF: DUP?
-                element.jsonObject.get("actual")
+                element.jsonObject["actual"]
                     .check { it?.jsonPrimitive?.content == expectedActual }
-                element.jsonObject.get("marked")
+                element.jsonObject["marked"]
                     .check { it?.jsonPrimitive?.content == expectedMarked }
             }
         }

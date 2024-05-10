@@ -15,6 +15,8 @@ limitations under the License.
  */
 package net.saff.checkmark
 
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import net.saff.prettyprint.cleanPairsForDisplay
@@ -35,10 +37,11 @@ class Checkmark {
             }
         }
 
+        // SAFF: can we avoid this when message isn't big?
         // IntelliJ + Gradle tends to print error messages twice, messing up the output.
         // Therefore, only return the real error message once (yes, this could backfire, but we'll
         // handle that when it comes)
-        var bigMessageRetrieved = false
+        private var bigMessageRetrieved = false
         override val message: String?
             get() {
                 System.out.println("big message retrieved: $bigMessageRetrieved")
@@ -54,10 +57,10 @@ class Checkmark {
         }
     }
 
-    private val marks = mutableListOf<() -> String>()
+    private val marks = mutableListOf<() -> Any?>()
 
     fun <T> mark(note: T): T {
-        marks.add { note.toString() }
+        marks.add { note }
         return note
     }
 
@@ -114,21 +117,25 @@ class Checkmark {
                 addAll(cm.marks.map { "marked" to it() })
             }
 
-            reports.singleOrNull()?.let { return it.second.toString().forCleanDisplay() }
+            // SAFF: but we may still want JSON if second has structure
+            reports.singleOrNull()
+                ?.let { return it.second.orElse("null").toString().forCleanDisplay() }
 
             if (useJson) {
-                // SAFF: should this have a special case for only actual, like below?
-                // SAFF: indentation is annoying here
+                // SAFF: lists
+                // SAFF: maps
                 // SAFF: not all values are going to be strings, are they?
                 val contentMap =
-                    reports.associate { it.first to JsonPrimitive(it.second.toString()) }
+                    reports.associate {
+                        val value = it.second
+                        it.first to value.jsonSerialize()
+                    }
                 val jsonObject = JsonObject(contentMap)
                 val format = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US)
                 val dateString = format.format(Date())
                 val file = File("/tmp/compare_$dateString.json")
                 // Create a uniquely named file with a timestamp in the filename in /tmp
 
-                // SAFF: something.json is not always the right value
                 file.writeText(jsonObject.toString())
                 // SAFF: include _something_?
                 return "[more: $file]"
@@ -136,6 +143,14 @@ class Checkmark {
 
             // SAFF: match all of this with above
             return cleanPairsForDisplay(reports)
+        }
+
+        private fun Any?.jsonSerialize(): JsonElement {
+            return if (this is List<*>) {
+                JsonArray(this.map { it.jsonSerialize() })
+            } else {
+                JsonPrimitive(toString())
+            }
         }
 
         private fun cleanPairsForDisplay(reports: List<Pair<String, Any?>>) =
@@ -176,6 +191,8 @@ class Checkmark {
         var suppressDuplicateMessages = true
     }
 }
+
+private fun <T> T?.orElse(sub: T) = this ?: sub
 
 fun thrown(fn: () -> Any?): Throwable? {
     try {
