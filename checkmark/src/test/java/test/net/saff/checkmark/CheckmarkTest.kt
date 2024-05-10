@@ -70,13 +70,7 @@ class CheckmarkTest {
     @Test
     fun jsonOutputWithMark() {
         val message = useJson { thrown { "A".check { it == mark("B") } }!!.message!! }
-
-        val matcher = message.jsonMatcher()
-        val jsonFile = matcher.check {
-            // SAFF: this outputs both marked and message.  Only one is needed
-            mark(message)
-            it.find()
-        }.group(1) ?: fail(message)
+        val jsonFile = message.jsonFileFromMessage()
         jsonFile.check { it.startsWith("/tmp") }
         val element = Json.parseToJsonElement(File(jsonFile).readText())
         // SAFF: DUP?
@@ -93,18 +87,21 @@ class CheckmarkTest {
             }!!.message!!
         }
 
-        val matcher = message.jsonMatcher()
-        val jsonFile = matcher.check {
-            // SAFF: this outputs both marked and message.  Only one is needed
-            mark(message)
-            it.find()
-        }.group(1) ?: fail(message)
+        val jsonFile = message.jsonFileFromMessage()
         jsonFile.check { it.startsWith("/tmp") }
         val element = Json.parseToJsonElement(File(jsonFile).readText())
         // SAFF: DUP?
         element.jsonObject["actual"].check { it?.jsonPrimitive?.content == "A" }
         element.jsonObject["note"].check { it?.jsonPrimitive?.content == "B" }
         element.jsonObject.check { !it.contains("marked") }
+    }
+
+    private fun String.jsonFileFromMessage(): String {
+        return jsonMatcher().check {
+            // SAFF: this outputs both marked and message.  Only one is needed
+            mark(this@jsonFileFromMessage)
+            it.find()
+        }.group(1) ?: fail(this)
     }
 
     @Test
@@ -115,12 +112,7 @@ class CheckmarkTest {
 
         message.check { it.contains("[A]") }
         message.check { !it.contains("B") }
-        val matcher = message.jsonMatcher()
-        val jsonFile = matcher.check {
-            // SAFF: this outputs both marked and message.  Only one is needed
-            mark(message)
-            it.find()
-        }.group(1) ?: fail(message)
+        val jsonFile = message.jsonFileFromMessage()
         jsonFile.check { it.startsWith("/tmp") }
         val element = Json.parseToJsonElement(File(jsonFile).readText())
         // SAFF: DUP?
@@ -138,12 +130,7 @@ class CheckmarkTest {
             thrown { listOf("A").check { it == mark(mapOf("B" to 2, "C" to 3)) } }!!.message!!
         }
 
-        val matcher = message.jsonMatcher()
-        val jsonFile = matcher.check {
-            // SAFF: this outputs both marked and message.  Only one is needed
-            mark(message)
-            it.find()
-        }.group(1) ?: fail(message)
+        val jsonFile = message.jsonFileFromMessage()
         jsonFile.check { it.startsWith("/tmp") }
         val element = Json.parseToJsonElement(File(jsonFile).readText())
         // SAFF: DUP?
@@ -161,12 +148,7 @@ class CheckmarkTest {
         val message =
             useJson { thrown { listOf("A").check { it == listOf("B", "C") } }!!.message!! }
 
-        val matcher = message.jsonMatcher()
-        val jsonFile = matcher.check {
-            // SAFF: this outputs both marked and message.  Only one is needed
-            mark(message)
-            it.find()
-        }.group(1) ?: fail(message)
+        val jsonFile = message.jsonFileFromMessage()
         jsonFile.check { it.startsWith("/tmp") }
         val element = Json.parseToJsonElement(File(jsonFile).readText())
         // SAFF: DUP?
@@ -190,15 +172,11 @@ class CheckmarkTest {
             val expectedActual = chooseString("actual?")
             val expectedMarked = chooseString("marked?")
             if (expectedActual != expectedMarked) {
+                // SAFF: clean up
                 val message =
                     useJson { thrown { expectedActual.check { it == mark(expectedMarked) } }!!.message!! }
 
-                val matcher = message.jsonMatcher()
-                val jsonFile = matcher.check {
-                    // SAFF: this outputs both marked and message.  Only one is needed
-                    mark(message)
-                    it.find()
-                }.group(1) ?: fail(message)
+                val jsonFile = message.jsonFileFromMessage()
                 val element = Json.parseToJsonElement(File(jsonFile).readText())
                 // SAFF: DUP?
                 element.jsonObject["actual"]
