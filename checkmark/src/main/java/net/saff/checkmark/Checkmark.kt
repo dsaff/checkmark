@@ -15,9 +15,6 @@ limitations under the License.
  */
 package net.saff.checkmark
 
-import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import net.saff.prettyprint.cleanPairsForDisplay
 import java.io.File
@@ -191,16 +188,4 @@ fun thrown(fn: () -> Any?): Throwable? {
         return t
     }
     return null
-}
-
-// SAFF: use in map serialization
-private fun Any?.jsonSerialize(): JsonElement {
-    return when (this) {
-        is List<*> -> JsonArray(map { it.jsonSerialize() })
-
-        is Map<*, *> ->
-            JsonObject(mapValues { it.value.jsonSerialize() }.mapKeys { it.key.toString() })
-
-        else -> JsonPrimitive(toString())
-    }
 }
