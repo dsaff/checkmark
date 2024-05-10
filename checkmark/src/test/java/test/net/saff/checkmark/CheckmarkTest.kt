@@ -1,6 +1,7 @@
 package test.net.saff.checkmark
 
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
@@ -70,9 +71,7 @@ class CheckmarkTest {
     @Test
     fun jsonOutputWithMark() {
         val message = useJson { thrown { "A".check { it == mark("B") } }!!.message!! }
-        val jsonFile = message.jsonFileFromMessage()
-        jsonFile.check { it.startsWith("/tmp") }
-        val element = Json.parseToJsonElement(File(jsonFile).readText())
+        val element = message.storedJsonElement()
         // SAFF: DUP?
         element.jsonObject["actual"].check { it?.jsonPrimitive?.content == "A" }
         element.jsonObject["marked"].check { it?.jsonPrimitive?.content == "B" }
@@ -87,9 +86,7 @@ class CheckmarkTest {
             }!!.message!!
         }
 
-        val jsonFile = message.jsonFileFromMessage()
-        jsonFile.check { it.startsWith("/tmp") }
-        val element = Json.parseToJsonElement(File(jsonFile).readText())
+        val element = message.storedJsonElement()
         // SAFF: DUP?
         element.jsonObject["actual"].check { it?.jsonPrimitive?.content == "A" }
         element.jsonObject["note"].check { it?.jsonPrimitive?.content == "B" }
@@ -112,9 +109,7 @@ class CheckmarkTest {
 
         message.check { it.contains("[A]") }
         message.check { !it.contains("B") }
-        val jsonFile = message.jsonFileFromMessage()
-        jsonFile.check { it.startsWith("/tmp") }
-        val element = Json.parseToJsonElement(File(jsonFile).readText())
+        val element = message.storedJsonElement()
         // SAFF: DUP?
         val actualList = element.jsonObject["actual"]?.jsonArray?.toList()
         actualList.check { it == listOf(JsonPrimitive("A")) }
@@ -130,9 +125,7 @@ class CheckmarkTest {
             thrown { listOf("A").check { it == mark(mapOf("B" to 2, "C" to 3)) } }!!.message!!
         }
 
-        val jsonFile = message.jsonFileFromMessage()
-        jsonFile.check { it.startsWith("/tmp") }
-        val element = Json.parseToJsonElement(File(jsonFile).readText())
+        val element = message.storedJsonElement()
         // SAFF: DUP?
         val actualList = element.jsonObject["actual"]?.jsonArray?.toList()
         actualList.check { it == listOf(JsonPrimitive("A")) }
@@ -148,13 +141,16 @@ class CheckmarkTest {
         val message =
             useJson { thrown { listOf("A").check { it == listOf("B", "C") } }!!.message!! }
 
-        val jsonFile = message.jsonFileFromMessage()
-        jsonFile.check { it.startsWith("/tmp") }
-        val element = Json.parseToJsonElement(File(jsonFile).readText())
+        val element = message.storedJsonElement()
         // SAFF: DUP?
         val actualList = element.jsonObject["actual"]?.jsonArray?.toList()
         actualList.check { it == listOf(JsonPrimitive("A")) }
         element.jsonObject["marked"].check { it == null }
+    }
+
+    private fun String.storedJsonElement(): JsonElement {
+        val jsonFile = jsonFileFromMessage().check { it.startsWith("/tmp") }
+        return Json.parseToJsonElement(File(jsonFile).readText())
     }
 
     @Test
