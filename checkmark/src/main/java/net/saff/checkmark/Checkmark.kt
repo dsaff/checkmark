@@ -127,19 +127,15 @@ class Checkmark {
 
             val cleanPairsForDisplay = cleanPairsForDisplay(reports)
             if (useJson) {
-                val contentMap = reports.associate {
-                    it.first to it.second.jsonSerialize()
-                }
-                val jsonObject = JsonObject(contentMap)
+                val jsonObject = reports.toMap().jsonSerialize()
                 val format = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US)
                 val dateString = format.format(Date())
                 val file = File("/tmp/compare_$dateString.json")
                 // Create a uniquely named file with a timestamp in the filename in /tmp
 
                 file.writeText(jsonObject.toString())
+
                 val firstLine = cleanPairsForDisplay.lines().first { it.isNotBlank() }
-                // SAFF: this should be URL
-                // SAFF: not if multi-line
                 return "$firstLine [more: file://${file}]"
             }
 
@@ -172,7 +168,6 @@ class Checkmark {
             return this
         }
 
-        // SAFF: choose an indentation style
         fun <T> useJson(fn: () -> T): T {
             useJson = true
             try {
@@ -195,7 +190,6 @@ fun thrown(fn: () -> Any?): Throwable? {
     } catch (t: Throwable) {
         return t
     }
-    // SAFF: long
     return null
 }
 
