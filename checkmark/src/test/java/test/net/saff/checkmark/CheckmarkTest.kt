@@ -93,6 +93,7 @@ class CheckmarkTest {
         val message =
             useJson { thrown { listOf("A").check { it == mark(listOf("B", "C")) } }!!.message!! }
 
+        message.check { it.contains("[A]") }
         val matcher = "\\[more: (.*\\.json)]".toPattern().matcher(message)
         val jsonFile = matcher.check {
             // SAFF: this outputs both marked and message.  Only one is needed

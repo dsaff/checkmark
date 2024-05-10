@@ -125,9 +125,8 @@ class Checkmark {
                 }
             }
 
+            val cleanPairsForDisplay = cleanPairsForDisplay(reports)
             if (useJson) {
-                // SAFF: maps
-                // SAFF: not all values are going to be strings, are they?
                 val contentMap = reports.associate {
                     it.first to it.second.jsonSerialize()
                 }
@@ -139,11 +138,11 @@ class Checkmark {
 
                 file.writeText(jsonObject.toString())
                 // SAFF: include _something_?
-                return "[more: $file]"
+                // SAFF: not if multi-line
+                return "$cleanPairsForDisplay [more: $file]"
             }
 
-            // SAFF: match all of this with above
-            return cleanPairsForDisplay(reports)
+            return cleanPairsForDisplay
         }
 
         private fun Any?.cleanString() = orElse("null").toString().forCleanDisplay()
