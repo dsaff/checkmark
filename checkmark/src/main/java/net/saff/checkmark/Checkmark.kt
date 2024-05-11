@@ -15,7 +15,6 @@ limitations under the License.
  */
 package net.saff.checkmark
 
-import kotlinx.serialization.json.JsonPrimitive
 import net.saff.prettyprint.cleanPairsForDisplay
 
 class Checkmark {
@@ -154,8 +153,7 @@ interface MessageAssembler {
 data object StringMessageAssembler : MessageAssembler {
     override fun assembleMessage(reports: List<Pair<String, Any?>>): String {
         reports.singleOrNull()?.second?.let { single ->
-            // SAFF: do we want a better type for this?
-            if (single.jsonSerialize() is JsonPrimitive) {
+            if (single !is Collection<*>) {
                 return single.cleanString()
             }
         }
