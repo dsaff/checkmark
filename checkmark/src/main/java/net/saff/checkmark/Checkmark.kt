@@ -118,7 +118,12 @@ class Checkmark {
         }
 
         private fun assembleMessage(reports: List<Pair<String, Any?>>): String {
-            return messageAssembler.assembleMessage(reports)
+            reports.singleOrNull()?.second?.let { single ->
+                if (single !is Collection<*>) {
+                    return single.cleanString()
+                }
+            }
+            return messageAssembler.assembleComplexMessage(reports)
         }
 
         fun <T> T.checkCompletes(eval: Checkmark.(T) -> Unit): T {
@@ -147,17 +152,11 @@ class Checkmark {
 }
 
 interface MessageAssembler {
-    fun assembleMessage(reports: List<Pair<String, Any?>>): String
+    fun assembleComplexMessage(reports: List<Pair<String, Any?>>): String
 }
 
 data object StringMessageAssembler : MessageAssembler {
-    override fun assembleMessage(reports: List<Pair<String, Any?>>): String {
-        reports.singleOrNull()?.second?.let { single ->
-            if (single !is Collection<*>) {
-                return single.cleanString()
-            }
-        }
-
+    override fun assembleComplexMessage(reports: List<Pair<String, Any?>>): String {
         return reports.cleanPairsAsLines()
     }
 }

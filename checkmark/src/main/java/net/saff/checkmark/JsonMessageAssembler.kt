@@ -10,21 +10,12 @@ import java.util.Date
 import java.util.Locale
 
 data object JsonMessageAssembler : MessageAssembler {
-    override fun assembleMessage(reports: List<Pair<String, Any?>>): String {
-        // SAFF: DUP other?
-        reports.singleOrNull()?.second?.let { single ->
-            if (single.jsonSerialize() is JsonPrimitive) {
-                return single.cleanString()
-            }
-        }
-
+    override fun assembleComplexMessage(reports: List<Pair<String, Any?>>): String {
         val cleanPairsForDisplay = reports.cleanPairsAsLines()
         val jsonObject = reports.toMap().jsonSerialize()
         val format = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US)
         val dateString = format.format(Date())
         val file = File("/tmp/compare_$dateString.json")
-        // Create a uniquely named file with a timestamp in the filename in /tmp
-
         file.writeText(jsonObject.toString())
 
         val firstLine = cleanPairsForDisplay.lines().first { it.isNotBlank() }
@@ -32,7 +23,6 @@ data object JsonMessageAssembler : MessageAssembler {
     }
 }
 
-// SAFF: move
 fun Any?.jsonSerialize(): JsonElement {
     return when (this) {
         is List<*> -> JsonArray(map { it.jsonSerialize() })
