@@ -17,10 +17,6 @@ package net.saff.checkmark
 
 import kotlinx.serialization.json.JsonPrimitive
 import net.saff.prettyprint.cleanPairsForDisplay
-import java.io.File
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 class Checkmark {
     class Failure(s: String, e: Throwable? = null) :
@@ -40,7 +36,7 @@ class Checkmark {
         private var bigMessageRetrieved = false
         override val message: String?
             get() {
-                System.out.println("big message retrieved: $bigMessageRetrieved")
+                println("big message retrieved: $bigMessageRetrieved")
                 if (!bigMessageRetrieved || !suppressDuplicateMessages) {
                     val message = super.message
                     if (message?.contains("\n") == true) {
@@ -123,8 +119,7 @@ class Checkmark {
         }
 
         private fun assembleMessage(reports: List<Pair<String, Any?>>): String {
-            val assembler = if (useJson) JsonMessageAssembler() else StringMessageAssembler()
-            return assembler.assembleMessage(reports)
+            return messageAssembler.assembleMessage(reports)
         }
 
         fun <T> T.checkCompletes(eval: Checkmark.(T) -> Unit): T {
@@ -137,16 +132,17 @@ class Checkmark {
             return this
         }
 
-        fun <T> useJson(fn: () -> T): T {
-            useJson = true
+        fun <T> useMessageAssembler(assembler: MessageAssembler, fn: () -> T): T {
+            val previous = messageAssembler
+            messageAssembler = assembler
             try {
                 return fn()
             } finally {
-                useJson = false
+                messageAssembler = previous
             }
         }
 
-        private var useJson = false
+        private var messageAssembler: MessageAssembler = StringMessageAssembler
         var suppressDuplicateMessages = true
     }
 }
@@ -155,48 +151,23 @@ interface MessageAssembler {
     fun assembleMessage(reports: List<Pair<String, Any?>>): String
 }
 
-// SAFF: long?
-class StringMessageAssembler : MessageAssembler {
+data object StringMessageAssembler : MessageAssembler {
     override fun assembleMessage(reports: List<Pair<String, Any?>>): String {
         reports.singleOrNull()?.second?.let { single ->
+            // SAFF: do we want a better type for this?
             if (single.jsonSerialize() is JsonPrimitive) {
                 return single.cleanString()
             }
         }
 
-        return cleanPairsForDisplay(reports)
+        return reports.cleanPairsAsLines()
     }
 }
 
-class JsonMessageAssembler : MessageAssembler {
-    override fun assembleMessage(reports: List<Pair<String, Any?>>): String {
-        // SAFF: DUP other?
-        reports.singleOrNull()?.second?.let { single ->
-            if (single.jsonSerialize() is JsonPrimitive) {
-                return single.cleanString()
-            }
-        }
+fun Any?.cleanString() = orElse("null").toString().forCleanDisplay()
 
-        val cleanPairsForDisplay = cleanPairsForDisplay(reports)
-        val jsonObject = reports.toMap().jsonSerialize()
-        val format = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US)
-        val dateString = format.format(Date())
-        val file = File("/tmp/compare_$dateString.json")
-        // Create a uniquely named file with a timestamp in the filename in /tmp
-
-        file.writeText(jsonObject.toString())
-
-        val firstLine = cleanPairsForDisplay.lines().first { it.isNotBlank() }
-        return "$firstLine [more: file://${file}]"
-    }
-}
-
-private fun Any?.cleanString() = orElse("null").toString().forCleanDisplay()
-
-private fun cleanPairsForDisplay(reports: List<Pair<String, Any?>>) =
-    reports.joinToString(separator = "") {
-        "\n- ${it.first}: ${it.second.toString().forCleanDisplay()}"
-    }
+fun List<Pair<String, Any?>>.cleanPairsAsLines() =
+    joinToString(separator = "") { "\n- ${it.first}: ${it.second.toString().forCleanDisplay()}" }
 
 private fun String.forCleanDisplay(): String {
     return if (!contains("\n")) {

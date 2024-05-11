@@ -13,8 +13,8 @@ import net.saff.checkmark.Checkmark.Companion.check
 import net.saff.checkmark.Checkmark.Companion.checkCompletes
 import net.saff.checkmark.Checkmark.Companion.checks
 import net.saff.checkmark.Checkmark.Companion.fail
-import net.saff.checkmark.Checkmark.Companion.useJson
 import net.saff.checkmark.thrown
+import net.saff.checkmark.useJson
 import net.saff.prettyprint.showWhitespace
 import org.junit.Test
 import java.io.File
