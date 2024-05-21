@@ -1,5 +1,7 @@
 package net.saff.checkmark
 
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
@@ -10,13 +12,14 @@ import java.util.Date
 import java.util.Locale
 
 data object JsonMessageAssembler : MessageAssembler {
+    private val json = Json { prettyPrint = true }
     override fun assembleComplexMessage(reports: List<Pair<String, Any?>>): String {
         val cleanPairsForDisplay = reports.cleanPairsAsLines()
         val jsonObject = reports.toMap().jsonSerialize()
         val format = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US)
         val dateString = format.format(Date())
         val file = File("/tmp/compare_$dateString.json")
-        file.writeText(jsonObject.toString())
+        file.writeText(json.encodeToString(jsonObject))
 
         val firstLine = cleanPairsForDisplay.lines().first { it.isNotBlank() }
         return "$firstLine [more: file://${file}]"

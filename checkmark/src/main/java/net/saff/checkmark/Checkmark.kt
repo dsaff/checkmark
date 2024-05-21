@@ -15,7 +15,9 @@ limitations under the License.
  */
 package net.saff.checkmark
 
-import net.saff.prettyprint.cleanPairsForDisplay
+interface Structured {
+    fun toStructure(): Any
+}
 
 class Checkmark {
     class Failure(s: String, e: Throwable? = null) :
@@ -84,7 +86,7 @@ class Checkmark {
             try {
                 fn()
             } catch (e: Throwable) {
-                fail(extractClosureFields(fn).cleanPairsForDisplay(), e)
+                fail(assembleMessage(extractClosureFields(fn)), e)
             }
         }
 
@@ -96,7 +98,7 @@ class Checkmark {
                     field.isAccessible = true
                     val gotten = field.get(closure)
                     if (gotten !is Function<*>) {
-                        add(field.name.removePrefix("\$") to gotten)
+                        add(field.name.removePrefix("\$") to gotten.structured())
                     }
                 }
             }
@@ -105,12 +107,13 @@ class Checkmark {
         private fun <T> allDebugOutput(
             receiver: T, cm: Checkmark, eval: Checkmark.(T) -> Boolean
         ): String {
+            val marks = cm.marks
             val reports = buildList {
                 add("actual" to receiver)
                 val elements = extractClosureFields(eval)
                 val elementMap = elements.toMap()
                 addAll(elements)
-                addAll(cm.marks.map { "marked" to it() }
+                addAll(marks.map { "marked" to it() }
                     .filter { !elementMap.values.contains(it.second) })
             }
 
@@ -148,6 +151,14 @@ class Checkmark {
 
         private var messageAssembler: MessageAssembler = StringMessageAssembler
         var suppressDuplicateMessages = true
+    }
+}
+
+private fun Any.structured(): Any {
+    return if (this is Structured) {
+        toStructure()
+    } else {
+        this
     }
 }
 
