@@ -82,11 +82,12 @@ class Checkmark {
             return this
         }
 
-        fun checks(fn: () -> Unit) {
+        fun checks(fn: Checkmark.() -> Unit) {
+            val cm = Checkmark()
             try {
-                fn()
+                cm.fn()
             } catch (e: Throwable) {
-                fail(assembleMessage(extractClosureFields(fn)), e)
+                fail(allDebugOutput(cm, fn), e)
             }
         }
 
@@ -111,6 +112,20 @@ class Checkmark {
             val reports = buildList {
                 add("actual" to receiver)
                 val elements = extractClosureFields(eval)
+                val elementMap = elements.toMap()
+                addAll(elements)
+                addAll(marks.map { "marked" to it() }
+                    .filter { !elementMap.values.contains(it.second) })
+            }
+
+            return assembleMessage(reports)
+        }
+
+        private fun allDebugOutput(cm: Checkmark, closure: Any): String {
+            val marks = cm.marks
+            // SAFF: DUP above
+            val reports = buildList {
+                val elements = extractClosureFields(closure)
                 val elementMap = elements.toMap()
                 addAll(elements)
                 addAll(marks.map { "marked" to it() }
