@@ -19,8 +19,3 @@ dependencies {
     implementation(kotlin("reflect"))
     testImplementation(project(":checkmark"))
 }
-
-// SAFF: if this works, remove it everywhere
-// kotlin {
-//     jvmToolchain(8)
-// }

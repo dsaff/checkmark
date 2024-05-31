@@ -43,10 +43,6 @@ android {
         minSdk = 30
         targetSdk = 33
     }
-    // SAFF: remove?
-//    kotlinOptions {
-//        jvmTarget = "1.8"
-//    }
     buildFeatures {
         compose = true
     }

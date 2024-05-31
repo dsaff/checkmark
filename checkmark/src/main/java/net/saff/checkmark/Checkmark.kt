@@ -71,13 +71,19 @@ class Checkmark {
 
         fun <T> T.check(eval: Checkmark.(T) -> Boolean): T {
             val cm = Checkmark()
+            fun debugOutput() = allDebugOutput {
+                add("actual" to this@check)
+                addAll(eval.extractClosureFields())
+                addAll(cm.markReports())
+            }
+
             val result = try {
                 cm.eval(this)
             } catch (t: Throwable) {
-                fail("ERROR: ${allDebugOutput(this, cm, eval)}", t)
+                fail("ERROR: ${debugOutput()}", t)
             }
             if (!result) {
-                fail("Failed assertion: ${allDebugOutput(this, cm, eval)}")
+                fail("Failed assertion: ${debugOutput()}")
             }
             return this
         }
@@ -87,17 +93,22 @@ class Checkmark {
             try {
                 cm.fn()
             } catch (e: Throwable) {
-                fail(allDebugOutput(cm, fn), e)
+                fail(
+                    allDebugOutput {
+                        addAll(fn.extractClosureFields())
+                        addAll(cm.markReports())
+                    }, e
+                )
             }
         }
 
-        private fun extractClosureFields(closure: Any) = buildList {
-            closure::class.java.declaredFields.forEach { field ->
+        private fun Any.extractClosureFields() = buildList {
+            this@extractClosureFields::class.java.declaredFields.forEach { field ->
                 // Not sure why this is needed.
                 // https://github.com/dsaff/checkmark/issues/1
                 if (field.name != "INSTANCE") {
                     field.isAccessible = true
-                    val gotten = field.get(closure)
+                    val gotten = field.get(this@extractClosureFields)
                     if (gotten !is Function<*>) {
                         add(field.name.removePrefix("\$") to gotten.structured())
                     }
@@ -105,34 +116,10 @@ class Checkmark {
             }
         }
 
-        private fun <T> allDebugOutput(
-            receiver: T, cm: Checkmark, eval: Checkmark.(T) -> Boolean
-        ): String {
-            val marks = cm.marks
-            val reports = buildList {
-                add("actual" to receiver)
-                val elements = extractClosureFields(eval)
-                val elementMap = elements.toMap()
-                addAll(elements)
-                addAll(marks.map { "marked" to it() }
-                    .filter { !elementMap.values.contains(it.second) })
-            }
+        private fun Checkmark.markReports() = marks.map { "marked" to it() }
 
-            return assembleMessage(reports)
-        }
-
-        private fun allDebugOutput(cm: Checkmark, closure: Any): String {
-            val marks = cm.marks
-            // SAFF: DUP above
-            val reports = buildList {
-                val elements = extractClosureFields(closure)
-                val elementMap = elements.toMap()
-                addAll(elements)
-                addAll(marks.map { "marked" to it() }
-                    .filter { !elementMap.values.contains(it.second) })
-            }
-
-            return assembleMessage(reports)
+        private fun allDebugOutput(fn: MutableList<Pair<String, Any?>>.() -> Unit): String {
+            return assembleMessage(buildList(fn).distinctBy { it.second })
         }
 
         private fun assembleMessage(reports: List<Pair<String, Any?>>): String {
@@ -169,7 +156,7 @@ class Checkmark {
     }
 }
 
-private fun Any.structured(): Any {
+private fun Any?.structured(): Any? {
     return if (this is Structured) {
         toStructure()
     } else {
