@@ -36,16 +36,17 @@ android {
     compileSdk = 33
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     defaultConfig {
         minSdk = 30
         targetSdk = 33
     }
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
+    // SAFF: remove?
+//    kotlinOptions {
+//        jvmTarget = "1.8"
+//    }
     buildFeatures {
         compose = true
     }

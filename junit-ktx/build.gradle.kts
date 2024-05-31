@@ -20,6 +20,7 @@ dependencies {
     testImplementation(project(":checkmark"))
 }
 
-kotlin {
-    jvmToolchain(8)
-}
+// SAFF: if this works, remove it everywhere
+// kotlin {
+//     jvmToolchain(8)
+// }
