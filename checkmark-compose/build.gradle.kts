@@ -30,7 +30,6 @@ plugins {
     id("org.jetbrains.kotlin.android")
 }
 
-// SAFF: catch up?
 android {
     namespace = "net.saff.checkmark.compose"
 
