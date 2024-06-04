@@ -30,19 +30,14 @@ plugins {
     id("org.jetbrains.kotlin.android")
 }
 
+// SAFF: catch up?
 android {
     namespace = "net.saff.checkmark.compose"
 
-    compileSdk = 33
+    compileSdk = 34
 
-    // SAFF: remove?
-//    compileOptions {
-//        sourceCompatibility = JavaVersion.VERSION_17
-//        targetCompatibility = JavaVersion.VERSION_17
-//    }
     defaultConfig {
         minSdk = 30
-        targetSdk = 33
     }
     buildFeatures {
         compose = true
@@ -64,17 +59,17 @@ dependencies {
     implementation(project(":junit-ktx"))
     implementation(kotlin("stdlib-jdk8"))
     implementation(kotlin("reflect"))
-    implementation("androidx.compose.ui:ui-test-junit4:1.4.0-alpha03")
+    implementation("androidx.compose.ui:ui-test-junit4:1.6.7")
     testImplementation("org.robolectric:robolectric:4.9.2")
-    implementation("androidx.test.espresso:espresso-core:3.5.0")
+    implementation("androidx.test.espresso:espresso-core:3.5.1")
     implementation("androidx.customview:customview-poolingcontainer:1.0.0")
 
-    debugImplementation("androidx.compose.ui:ui-test-manifest:1.4.0-alpha03")
+    debugImplementation("androidx.compose.ui:ui-test-manifest:1.6.7")
 
     testImplementation("junit:junit:4.13.2")
-    testImplementation("androidx.compose.material:material:1.4.0-alpha03")
-    testImplementation("androidx.arch.core:core-runtime:2.1.0")
-    testImplementation("androidx.activity:activity-compose:1.6.1")
+    testImplementation("androidx.compose.material:material:1.6.7")
+    testImplementation("androidx.arch.core:core-runtime:2.2.0")
+    testImplementation("androidx.activity:activity-compose:1.9.0")
 }
 
 tasks.matching { it.name == "testReleaseUnitTest" }.all { enabled = false }
