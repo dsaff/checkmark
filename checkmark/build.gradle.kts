@@ -30,10 +30,11 @@ plugins {
   id("maven-publish")
 }
 
-java {
-  sourceCompatibility = JavaVersion.VERSION_1_8
-  targetCompatibility = JavaVersion.VERSION_1_8
-}
+// SAFF: remove?
+//java {
+//  sourceCompatibility = JavaVersion.VERSION_1_8
+//  targetCompatibility = JavaVersion.VERSION_1_8
+//}
 
 kotlin {}
 
@@ -57,14 +58,15 @@ val javadocJar by tasks.creating(Jar::class) {
   from(tasks["javadoc"])
 }
 
-val compileKotlin: KotlinCompile by tasks
-compileKotlin.kotlinOptions {
-  jvmTarget = "1.8"
-}
-val compileTestKotlin: KotlinCompile by tasks
-compileTestKotlin.kotlinOptions {
-  jvmTarget = "1.8"
-}
+// SAFF: remove?
+//val compileKotlin: KotlinCompile by tasks
+//compileKotlin.kotlinOptions {
+//  jvmTarget = "1.8"
+//}
+//val compileTestKotlin: KotlinCompile by tasks
+//compileTestKotlin.kotlinOptions {
+//  jvmTarget = "1.8"
+//}
 
 publishing {
   publications {
@@ -126,4 +128,8 @@ publishing {
 
 signing {
   sign(publishing.publications["maven"])
+}
+
+kotlin {
+    jvmToolchain(20)
 }

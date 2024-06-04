@@ -35,10 +35,11 @@ android {
 
     compileSdk = 33
 
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
+    // SAFF: remove?
+//    compileOptions {
+//        sourceCompatibility = JavaVersion.VERSION_17
+//        targetCompatibility = JavaVersion.VERSION_17
+//    }
     defaultConfig {
         minSdk = 30
         targetSdk = 33
@@ -64,7 +65,7 @@ dependencies {
     implementation(kotlin("stdlib-jdk8"))
     implementation(kotlin("reflect"))
     implementation("androidx.compose.ui:ui-test-junit4:1.4.0-alpha03")
-    testImplementation("org.robolectric:robolectric:4.9")
+    testImplementation("org.robolectric:robolectric:4.9.2")
     implementation("androidx.test.espresso:espresso-core:3.5.0")
     implementation("androidx.customview:customview-poolingcontainer:1.0.0")
 
@@ -77,3 +78,7 @@ dependencies {
 }
 
 tasks.matching { it.name == "testReleaseUnitTest" }.all { enabled = false }
+
+kotlin {
+    jvmToolchain(20)
+}

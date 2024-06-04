@@ -19,3 +19,7 @@ dependencies {
     implementation(kotlin("reflect"))
     testImplementation(project(":checkmark"))
 }
+
+kotlin {
+    jvmToolchain(20)
+}
