@@ -37,7 +37,7 @@ class JsonMessageAssemblerTest {
         }.storedJsonElement()
 
         element.jsonObject["actual"].check { it?.jsonPrimitive?.content == "A" }
-        element.jsonObject["note"].check { it?.jsonPrimitive?.content == "B" }
+        element.check { it.jsonObject["note"]?.jsonPrimitive?.content == "B" }
         element.jsonObject.check { !it.contains("marked") }
     }
 
