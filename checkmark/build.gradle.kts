@@ -117,7 +117,7 @@ signing {
 kotlin {
     jvmToolchain(17)
     compilerOptions {
-        // SAFF: needed for lambda capture
+        // Needed for lambda capture
         freeCompilerArgs.add("-Xlambdas=class")
     }
 }
