@@ -5,7 +5,7 @@ pluginManagement {
     mavenCentral()
   }
   plugins {
-    kotlin("multiplatform") version "1.7.0"
+    kotlin("multiplatform") version "2.1.10"
     kotlin("jvm") version "1.7.0"
     kotlin("android") version "1.7.0"
     kotlin("plugin.serialization") version "1.7.0"
