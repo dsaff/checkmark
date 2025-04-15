@@ -34,7 +34,7 @@ plugins {
 android {
     namespace = "net.saff.checkmark.compose"
 
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 30
@@ -69,7 +69,7 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     testImplementation("androidx.compose.material:material:1.6.7")
     testImplementation("androidx.arch.core:core-runtime:2.2.0")
-    testImplementation("androidx.activity:activity-compose:1.9.0")
+    testImplementation("androidx.activity:activity-compose:1.10.1")
 }
 
 tasks.matching { it.name == "testReleaseUnitTest" }.all { enabled = false }
