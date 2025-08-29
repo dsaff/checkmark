@@ -29,6 +29,7 @@ plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.compose")
+    id("compose-tests")
 }
 
 android {
@@ -54,6 +55,7 @@ android {
 
 kotlin {}
 
+// SAFF: upgrades
 dependencies {
     implementation(project(":checkmark"))
     implementation(project(":junit-ktx"))
@@ -71,8 +73,6 @@ dependencies {
     testImplementation("androidx.arch.core:core-runtime:2.2.0")
     testImplementation("androidx.activity:activity-compose:1.10.1")
 }
-
-tasks.matching { it.name == "testReleaseUnitTest" }.all { enabled = false }
 
 kotlin {
     jvmToolchain(20)
