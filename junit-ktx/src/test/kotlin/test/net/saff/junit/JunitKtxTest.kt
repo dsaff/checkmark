@@ -105,7 +105,7 @@ class JunitKtxTest {
         e.check { it!!.message!!.contains("different") }
     }
 
-    // SAFF: so it turns out, gradle strips the outer exception, if the inner one is an Assert.
+    // so it turns out, gradle strips the outer exception, if the inner one is an Assert.
     // Does this matter for rings?  Maybe, if we're trying to add data
     // an AssertionError.  https://github.com/gradle/gradle/pull/26399/files
     // https://github.com/gradle/gradle/issues/26299

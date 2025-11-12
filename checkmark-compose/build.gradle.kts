@@ -55,7 +55,6 @@ android {
 
 kotlin {}
 
-// SAFF: upgrades
 dependencies {
     implementation(project(":checkmark"))
     implementation(project(":junit-ktx"))
