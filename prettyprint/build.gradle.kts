@@ -35,7 +35,9 @@ java {
   targetCompatibility = JavaVersion.VERSION_1_8
 }
 
-kotlin {}
+kotlin {
+  jvmToolchain(8)
+}
 
 dependencies {
   implementation(kotlin("stdlib-jdk8"))
@@ -52,15 +54,6 @@ val javadocJar by tasks.creating(Jar::class) {
   dependsOn.add(tasks["javadoc"])
   archiveClassifier.set("javadoc")
   from(tasks["javadoc"])
-}
-
-val compileKotlin: KotlinCompile by tasks
-compileKotlin.kotlinOptions {
-  jvmTarget = "1.8"
-}
-val compileTestKotlin: KotlinCompile by tasks
-compileTestKotlin.kotlinOptions {
-  jvmTarget = "1.8"
 }
 
 publishing {
