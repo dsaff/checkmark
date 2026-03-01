@@ -35,7 +35,9 @@ java {
   targetCompatibility = JavaVersion.VERSION_1_8
 }
 
-kotlin {}
+kotlin {
+  jvmToolchain(8)
+}
 
 dependencies {
   implementation(kotlin("stdlib-jdk8"))
