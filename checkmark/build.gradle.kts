@@ -32,6 +32,8 @@ plugins {
 
 kotlin {}
 
+// SAFF: bartleby and ppq can both compile
+// SAFF: upgrades
 dependencies {
   implementation(project(":prettyprint"))
   implementation(kotlin("stdlib-jdk8"))

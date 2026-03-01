@@ -55,13 +55,13 @@ android {
 
 kotlin {}
 
-// SAFF: upgrades
 dependencies {
+    api("androidx.compose.ui:ui-test-junit4:1.6.7")
+
     implementation(project(":checkmark"))
     implementation(project(":junit-ktx"))
     implementation(kotlin("stdlib-jdk8"))
     implementation(kotlin("reflect"))
-    implementation("androidx.compose.ui:ui-test-junit4:1.6.7")
     testImplementation("org.robolectric:robolectric:4.9.2")
     implementation("androidx.test.espresso:espresso-core:3.5.1")
     implementation("androidx.customview:customview-poolingcontainer:1.0.0")
