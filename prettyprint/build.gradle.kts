@@ -13,6 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 buildscript {
@@ -56,13 +57,10 @@ val javadocJar by tasks.creating(Jar::class) {
   from(tasks["javadoc"])
 }
 
-val compileKotlin: KotlinCompile by tasks
-compileKotlin.kotlinOptions {
-  jvmTarget = "1.8"
-}
-val compileTestKotlin: KotlinCompile by tasks
-compileTestKotlin.kotlinOptions {
-  jvmTarget = "1.8"
+tasks.withType<KotlinCompile>().configureEach {
+  compilerOptions {
+    jvmTarget.set(JvmTarget.JVM_1_8)
+  }
 }
 
 publishing {
