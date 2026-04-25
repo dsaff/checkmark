@@ -33,7 +33,6 @@ plugins {
 kotlin {}
 
 dependencies {
-    // TODO: this depends on prettyprint being in the path
   implementation(project(":prettyprint"))
   implementation(kotlin("stdlib-jdk8"))
   testImplementation("junit:junit:4.13.2")
