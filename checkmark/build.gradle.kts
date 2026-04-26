@@ -32,6 +32,7 @@ plugins {
 
 kotlin {}
 
+// SAFF: warnings?
 dependencies {
   implementation(project(":prettyprint"))
   implementation(kotlin("stdlib-jdk8"))
@@ -41,6 +42,7 @@ dependencies {
   testImplementation(project(":befuzz"))
 }
 
+// SAFF: deprecated?
 val sourcesJar by tasks.creating(Jar::class) {
   archiveClassifier.set("sources")
   from(sourceSets.main.get().allSource)
