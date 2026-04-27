@@ -1,6 +1,5 @@
 rootProject.name = "sanctuary"
 
-// SAFF: DUP?
 dependencyResolutionManagement {
     repositories {
         mavenCentral()
