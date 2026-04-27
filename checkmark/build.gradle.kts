@@ -13,7 +13,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 buildscript {
   repositories {
@@ -32,7 +31,6 @@ plugins {
 
 kotlin {}
 
-// SAFF: warnings?
 dependencies {
   implementation(project(":prettyprint"))
   implementation(kotlin("stdlib-jdk8"))
@@ -42,16 +40,15 @@ dependencies {
   testImplementation(project(":befuzz"))
 }
 
-// SAFF: deprecated?
-val sourcesJar by tasks.creating(Jar::class) {
-  archiveClassifier.set("sources")
-  from(sourceSets.main.get().allSource)
+val sourcesJar by tasks.registering(Jar::class) {
+    archiveClassifier.set("sources")
+    from(sourceSets.main.get().allSource)
 }
 
-val javadocJar by tasks.creating(Jar::class) {
-  dependsOn.add(tasks["javadoc"])
-  archiveClassifier.set("javadoc")
-  from(tasks["javadoc"])
+val javadocJar by tasks.registering(Jar::class) {
+    dependsOn.add(tasks["javadoc"])
+    archiveClassifier.set("javadoc")
+    from(tasks["javadoc"])
 }
 
 publishing {
