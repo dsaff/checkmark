@@ -34,7 +34,7 @@ plugins {
 android {
     namespace = "net.saff.checkmark.compose"
 
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         minSdk = 30
