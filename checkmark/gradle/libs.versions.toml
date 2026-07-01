@@ -1,0 +1,8 @@
+[versions]
+checkmark = "0.1.5"
+junit = "4.13.2"
+kotlinxSerializationJson = "1.5.1"
+[libraries]
+checkmark = { module = "net.saff.checkmark:checkmark", version.ref = "checkmark" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }

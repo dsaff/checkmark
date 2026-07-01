@@ -28,3 +28,6 @@ project(":prettyprint").projectDir = file("../prettyprint")
 
 include(":befuzz")
 project(":befuzz").projectDir = file("../../befuzz")
+
+// SAFF: upgrades in libs.versions.toml
+// SAFF: We recommend upgrading to Gradle version 9.6.0.

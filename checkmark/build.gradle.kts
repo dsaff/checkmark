@@ -31,7 +31,9 @@ plugins {
 
 kotlin {}
 
+// SAFF: warnings
 dependencies {
+    // SAFF: this would probably be fine as a binary dependency to speed up builds
   implementation(project(":prettyprint"))
   implementation(kotlin("stdlib-jdk8"))
   testImplementation("junit:junit:4.13.2")
