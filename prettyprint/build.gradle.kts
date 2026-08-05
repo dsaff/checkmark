@@ -40,10 +40,9 @@ kotlin {
   jvmToolchain(8)
 }
 
-// SAFF: warnings
 dependencies {
   implementation(kotlin("stdlib-jdk8"))
-  testImplementation("junit:junit:4.13.1")
+  testImplementation(libs.junit)
   implementation(kotlin("reflect"))
 }
 
