@@ -123,7 +123,4 @@ signing {
   sign(publishing.publications["maven"])
 }
 
-// SAFF: undo while sorting
 // SAFF: Tasks that have been spun out to "Mad heap in bartleby" obsidian
-// SAFF: Tasks that have been spun out to "Undo consign" obsidian
-// SAFF: Tasks that have been spun out to "Bartleby is more delightful" obsidian
