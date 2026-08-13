@@ -1,7 +1,7 @@
 [versions]
-checkmark = "0.1.5"
+checkmark = "0.1.6"
 junit = "4.13.2"
-kotlinxSerializationJson = "1.5.1"
+kotlinxSerializationJson = "1.11.0"
 [libraries]
 checkmark = { module = "net.saff.checkmark:checkmark", version.ref = "checkmark" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
