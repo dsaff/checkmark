@@ -16,6 +16,7 @@ plugins {
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
     implementation("junit:junit:4.13.2")
+    implementation("net.saff.checkmark:checkmark:0.1.6")
     implementation(kotlin("reflect"))
     testImplementation(project(":checkmark"))
 }
